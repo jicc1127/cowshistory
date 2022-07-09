@@ -328,7 +328,7 @@ def fpySpdf_in_Dir_to_csv(Ext, Path, bckPath):
         拡張子　　　'\.pdf'　　
     Path : str
         path      '.\\' カレントディレクトリ
-    ｂｃｋPath : str
+    bckPath : str
         file移動するフォルダーのpath
 
     Returns
@@ -402,7 +402,7 @@ def fpyCowHistory(csvorgN, csvoutN):
     cowhistory_header = mhcow_data[0]
     print(cowhistory_header)
     cowhistory_header = cowhistory_header \
-        + ['No', '異動内容', '異動年月日', '住所', '氏名または名称'] #見出し行のリスト
+        + ['No', '異動内容', '異動年月日', '飼養施設所在地', '氏名または名称'] #見出し行のリスト
      
     output_file = open(csvoutN, 'w', newline='')
     output_writer = csv.writer(output_file)
@@ -415,8 +415,8 @@ def fpyCowHistory(csvorgN, csvoutN):
     #print(id_info)
     #id_info_ = id_info[0]
     id_info[0] = fpycsvidNo_9to10( id_info[0] ) #idNo
-    id_info[1] = fpydate_dottoslash( id_info[1]) #出生年月日
-    id_info[3] = fpycsvidNo_9to10( id_info[3] ) #idNo
+    id_info[1] = fpydate_dottoslash( id_info[1]) #出生年月日 'yyyy.mm.dd' -> 'yyyy/mm/dd'
+    id_info[3] = fpycsvidNo_9to10( id_info[3] ) #damidNo
     print(id_info)
     for row_num in range(5, row_max):
   
@@ -424,7 +424,7 @@ def fpyCowHistory(csvorgN, csvoutN):
         #['No', '異動内容', '異動年月日', '住所', '氏名または名称']
         #row_num行目の相対データ
         #print(history)
-        history[2] = fpydate_dottoslash( history[2])
+        history[2] = fpydate_dottoslash( history[2]) #異動年月日 'yyyy.mm.dd' -> 'yyyy/mm/dd'
         print(history)
         id_info_history = id_info + history #行データを結合
         output_writer.writerow(id_info_history)
@@ -617,7 +617,7 @@ def fpyHistory_csvto_xlsx(Ext, Path, bckPath, wbN, sheetN):
         拡張子　　　'\.csv'　　
     Path : str
         path      '.\\' カレントディレクトリ
-    ｂｃｋPath : str
+    bckPath : str
         file移動するフォルダーのpath
     wbN : str
         Excelfile to move History data  'MH_CowsHistory.xlsx'
@@ -1114,9 +1114,9 @@ fpyCowsHistoryManual:                        マニュアル
 2022/1/11
 @author: jicc
 """
-def fpyCowsHistoryManual():
+def fpyCowsHistoryManualfrmpdf():
     
-    print('-----CowsHistoryManual---------------------------------------------------------v1.01-------')
+    print('-----CowsHistoryManual from pdffile--------------------------------------------v1.01-------')
     print('1.ディレクトリ内(..//CowsHistory)の特定の拡張子(.pdf)を持つファイルを見つけcsvfile に変換する')
     print('	MH_???_yyyymmdd.pdf -> ****.csv テーブル部分のデータ抽出')
     print('	MH_???_yyyymmdd.pdf -> ".\\pdforg\\"へ移行')
