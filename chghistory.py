@@ -1109,7 +1109,7 @@ def fpychghistoryReference():
     
     
 """
-fpyCowsHistoryManual:                        マニュアル
+fpyCowsHistoryManualfrmpdf:                        マニュアル
 ｖ1.0
 2022/1/11
 @author: jicc
@@ -1117,6 +1117,10 @@ fpyCowsHistoryManual:                        マニュアル
 def fpyCowsHistoryManualfrmpdf():
     
     print('-----CowsHistoryManual from pdffile--------------------------------------------v1.01-------')
+    print(' ')
+    print(' \"牛の個体情報検索サービス-個体識別番号の検索\"から個体の異動情報を検索し、')
+    print('保存したpdffilesをExcelファイルにリスト化する。 ')
+    print(' ')
     print('1.ディレクトリ内(..//CowsHistory)の特定の拡張子(.pdf)を持つファイルを見つけcsvfile に変換する')
     print('	MH_???_yyyymmdd.pdf -> ****.csv テーブル部分のデータ抽出')
     print('	MH_???_yyyymmdd.pdf -> ".\\pdforg\\"へ移行')
@@ -1125,6 +1129,7 @@ def fpyCowsHistoryManualfrmpdf():
     print(' ')
     print('2.フォルダー内の個体履歴org(csv)をCowsHistory.csvに変更する')
     print('変更後orgcsvfile を　別フォルダー(./csvorg)に移動する')
+    print('MH_???_yyyymmdd.csv -> MH_???_yyyymmddH.csv')
     print('	MH_???_yyyymmdd.csv -> ".\\csvorg\\"へ移行')
     print('   PS> ps_fpyymd_csvtocowshistory_csv_args.py Ext Path bckPath')
     print(' Ext: \.csv, Path: .\\(カレントディレクトリ), bckPath: .\\csvorg')
@@ -1135,6 +1140,7 @@ def fpyCowsHistoryManualfrmpdf():
     print('   PS> ps_fpyhistory_csvto_xlsx_args.py Ext Path bckPath wbN sheetN')
     print(' Ext: \.csv, Path: .\\(カレントディレクトリ), bckPath: .\\csvhistory')
     print(' wbN: ..\\KT_CowsHistory.xlsx, sheetN:KTFarm')
+    print(' ')
     print('4.??_CowsHistory.xlsx\/??Farm の　str\"yyyy\/mm\/dd\"を')
     print('datetimeに変換する')
     print('   PS> ps_fpyxlstrymdtodatetime_args.py wbN sheetN　col')
@@ -1142,7 +1148,41 @@ def fpyCowsHistoryManualfrmpdf():
     print('---------------------------------------------------------------2022/3/6 by jicc---------')
     
 """
-fpyCowsHistoryTools:                        マニュアル
+fpyCowsHistoryManualfrmweb                        マニュアル
+ｖ1.0
+2022/7/11
+@author: jicc
+"""
+def fpyCowsHistoryManualfrmweb():
+    
+    print('-----CowsHistoryManual from web site------------------------------------------v1.0-------')
+    print(' ')
+    print('\"牛の個体情報検索サービス-個体識別番号の検索\"から個体の異動情報を検索し、 ')
+    print('Excelファイルにリスト化する。 ')
+    print(' ')
+    print('1. ABFarmの個体リスト(AB_cowslist.xlsx/ABFarm)から、個体識別番号(colum2 idno)によって、')
+    print('個体情報+異動情報を検索し、リストにし、idno_ymd.csv fileに保存する')
+    print('   PS> ps_fpyindtrsinf_to_csv_args.py wbN sheetN')
+    print(' wbN : AB_cowslist.xlsx, sheetN : cowslist')
+    print('牛の個体情報検索サービス-個体識別番号の検索')
+    print(' url : https://www.id.nlbc.go.jp/CattleSearch/search/agreement')
+    print(' ')
+    print('2.フォルダー内のidno_ymd.csvをcowshistory.xlsx/ABFarmに移動する')
+    print('移動後idno_ymd.csvを　別フォルダー(./csvhistory)に移動する')
+    print('	idno_ymd.csv -> ".\\csvhistory\\"へ移動')
+    print('   PS> python ps_fpyhistory_csvto_xlsx_args.py Ext Path bckPath wbN sheetN')
+    print(' Ext: \.csv, Path: .\\(カレントディレクトリ), bckPath: .\\csvhistory')
+    print(' wbN: (..\\)cowshistory.xlsx, sheetN:ABFarm')
+    print(' ')
+    print('3.cowshistory.xlsx\/ABFarm の　str\"yyyy\/mm\/dd\"を')
+    print('datetimeに変換する')
+    print('   PS> ps_fpyxlstrymdtodatetime_args.py wbN sheetN　col')
+    print(' wbN: ..\\KT_CowsHistory.xlsx, sheetN:KTFarm, col: 3 and 9')
+    print('---------------------------------------------------------------2022/7/11 by jicc---------')
+    
+    
+"""
+fpyCowsHistoryTools:                        tools
 ｖ1.0
 2022/1/11
 @author: jicc

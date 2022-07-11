@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#'牛の個体情報検索サービス-個体識別番号の検索'から個体の異動情報を検索し、保存したpdffilesを
+#'牛の個体情報検索サービス-個体識別番号の検索'から個体の異動情報を検索し、
 #Excelファイルにリスト化する。
 #url : https://www.id.nlbc.go.jp/CattleSearch/search/agreement'
 #コマンドラインから、引数を渡す
@@ -9,6 +9,6 @@
 
 import chghistory
 
-chghistory.fpyCowsHistoryManualfrmpdf()
+chghistory.fpyCowsHistoryManualfrmweb()
 
 
