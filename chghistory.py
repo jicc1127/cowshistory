@@ -337,9 +337,9 @@ def fpySpdf_in_Dir_to_csv(Ext, Path, bckPath):
 
     """
     
-    import os, re
-    import chghistory
-    import shutil
+    #import os, re
+    #import chghistory
+    #import shutil
     fs = os.listdir(Path)
     regex_ext = re.compile(Ext)
     #print(regex_ext)
@@ -351,12 +351,12 @@ def fpySpdf_in_Dir_to_csv(Ext, Path, bckPath):
             print(f)
             filename = f.split('.')
             filename = filename[0]
-            chghistory.fpypdf_to_csv(filename, Path)
+            fpypdf_to_csv(filename, Path)
             #print(mo.group())
             filename_pdf = filename + '.pdf'
             shutil.move(filename_pdf, bckPath)
             
-            
+#fpyCowHistory##############################################################            
 """
 fpyCowHistory
     牛の個体情報.csvから、CowHistory.csv(changehistory's list )を作成する
@@ -378,7 +378,7 @@ def fpyCowHistory(csvorgN, csvoutN):
     csvorgN : str
         もととなるcsvファイル        MH_???_yyyymmdd.csv
     csvoutN : str
-        作成するcsvファイル　　　　　　MH_???_History.csv　
+        作成するcsvファイル　　　　　　MH_???_yyyymmddH.csv　
 
     Returns
     -------
@@ -430,7 +430,8 @@ def fpyCowHistory(csvorgN, csvoutN):
         output_writer.writerow(id_info_history)
     
     output_file.close()
-            
+
+#fpycsvlisttoxls############################################################            
 """
 fpycsvlisttoxls: 
     csvfileのデータをexcelfileに移行する
@@ -491,7 +492,8 @@ def fpycsvlisttoxls(csvN, wbN, sheetN):
             
         
     wb.save(wbN)
-    
+
+#fpycsvidNo_9to10###########################################################    
 """
 fpycsvidNo_9to10:
     idNo in a csvfile 9figures to 10figures
@@ -593,8 +595,11 @@ def fpyymd_csvtoCowsHistory_csv(Ext, Path, bckPath):
             csvorgN = f
             fpyCowHistory(csvorgN, csvoutN)
             
-            shutil.move(csvorgN, bckPath)
-            #csvoriginalfile(csvodgN) を　フォルダーbckPathに移動
+            try:
+                shutil.move(csvorgN, bckPath)
+                #csvoriginalfile(csvodgN) を　フォルダーbckPathに移動
+            except shutil.Error:
+                print( csvorgN + ' already exists') 
      
             
             
@@ -755,7 +760,6 @@ def fpyxllist_to_list(wbN, sheetN, ncol):
     xllists : lists' list
 
     """
-    #from jiccModule import chghistory
     #import chghistory
     #import openpyxl
     
@@ -777,6 +781,108 @@ def fpyxllist_to_list(wbN, sheetN, ncol):
             
         xllists.append(xllist)
         xllist = []    
+    return xllists
+
+#fpyxllsit_to_indlist######################################################
+"""
+fpyxllist_to_indlist:
+    get an individual lists' list from excelfile's list
+        
+    ｖ1.00
+    2022/7/12
+    @author: jicc
+    
+"""
+def fpyxllist_to_indlist(wbN, sheetN, ncol, idno):
+    """
+    get an individual lists' list from excelfile's list
+
+    Parameters
+    ----------
+    wbN : str
+        Excelfile to move History data  '??_CowsHistory.xlsx'
+    sheetN : str
+        sheet name to add data   '??Farm' 
+    ncol :  int
+        number of columns
+    idno : str
+        ex. "0123456789"
+    Returns
+    -------
+    xllists : lists' list
+
+    """
+    #from jiccModule import chghistory
+    #import chghistory
+    #import openpyxl
+    
+    wbobj = fpyopenxl(wbN, sheetN)   #get Worksheet object
+    #wb = wbobj[0]
+    sheet = wbobj[1]
+    #wb = openpyxl.load_workbook(wbN)
+    #sheet = wb[sheetN]
+    max_row = sheet.max_row
+    # max_col = sheet.max_col
+    #AttributeError: 'Worksheet' object has no attribute 'max_col'
+    xllist = []
+    xllists = []
+    for i in range(2, max_row+1):   #タイトル行は飛ばす
+        idno_ = fpygetCell_value(sheet, i, 2) 
+        #excellist's idno column 2
+        if idno_ == idno:
+            for j in range(1,ncol+1):
+                coldata = sheet.cell(row=i, column=j).value
+                xllist.append(coldata)
+            
+            xllists.append(xllist)
+            xllist = [] 
+            
+    return xllists
+
+#fpyxllist_to_indlist_s######################################################
+"""
+fpyxllist_to_indlist_s:
+    get an individual lists' list from excelfile's list
+    arguments 'wbN, sheetN' -> 'sheet' worksheetobject version    
+    ｖ1.00
+    2022/7/17
+    @author: jicc
+    
+"""
+def fpyxllist_to_indlist_s(sheet, ncol, idno):
+    """
+    get an individual lists' list from excelfile's list
+
+    Parameters
+    ----------
+    sheet : worksheet.worksheet.Worksheet
+         worksheet object
+    ncol :  int
+        number of columns
+    idno : str
+        ex. "0123456789"
+    Returns
+    -------
+    xllists : lists' list
+
+    """
+    #import chghistory
+  
+    max_row = sheet.max_row
+
+    xllist = []
+    xllists = []
+    for i in range(2, max_row+1):   #タイトル行は飛ばす
+        idno_ = fpygetCell_value(sheet, i, 2) 
+        #excellist's idno column 2
+        if idno_ == idno:
+            for j in range(1,ncol+1):
+                coldata = sheet.cell(row=i, column=j).value
+                xllist.append(coldata)
+            
+            xllists.append(xllist)
+            xllist = [] 
+            
     return xllists
 
 #fpyaddclm_to_lsts_lst####################################################
@@ -878,6 +984,7 @@ def fpyflag_dblrcd_1(xllists):
                 if xllists[i][1:5] == xllists[j][1:5] and xllists[i][7:10] == xllists[j][7:10]:
                 #LinNo と No 以外が一致したら v1.01
                     xllists[i][11] = 1
+
                 else:
                     continue
             else:
@@ -885,24 +992,66 @@ def fpyflag_dblrcd_1(xllists):
             
     return xllists 
 
-#fpydel_dblrcd##############################################################
 """
-fpydel_dblrcd : delete double record
-   lists'listの重複リストの一つを削除する
-   
+fpyflag_dblrcd_1_ : flag double record 1
+   2つのlists'list　listorgとlisttmpを比較し、
+   listtmpの重複リストに　1（重複）でチェックを入れる
    v1.0
-   2022/3/29
-
-@author: inoue
+   2022/7/15
+   @author: jicc
+   
 """
-def fpydel_dblrcd(xllists, colv):
+def fpyflag_dblrcd_1_(xllists, trs_inf):
     """
-    lists'listの重複リストの一つを削除する
+    2つのlists'list　listorgとlisttmpを比較し、
+   listtmpの重複リストに　1（重複）でチェックを入れる
 
     Parameters
     ----------
     xllists : lists'list
+        lists'list from Excelfile original list
+    
+    trs_inf : lists'list
+        lists'list from web search data  
+
+    Returns
+    -------
+    重複リストに "1"を追加した　lists'list listtmp 
+
+    """
+    lxll = len(xllists)
+    ltrs = len(trs_inf)
+    
+    for i in range(1, ltrs):    #columns' list skip
+        for j in range(0, lxll):
+            #print(xllists[j])
+            if trs_inf[i][0:10] == xllists[j][1:]:
+                trs_inf[i][10] = 1
+            else:
+                continue
+            
+    return trs_inf
+
+#fpydel_dblrcd##############################################################
+"""
+fpydel_dblrcd : delete double record
+   lists'listの重複リストの一つを削除する
+   add argument coln v1.01 2022/7/16
+   v1.01
+   2022/7/16
+
+@author: inoue
+"""
+def fpydel_dblrcd(xllists, coln, colv):
+    """
+    lists'listの重複リストの一つを削除する
+    
+    Parameters
+    ----------
+    xllists : lists'list
         lists'list from Excelfile
+    coln : int
+        column flag's number 
     colv : int
         0, 1
 
@@ -915,7 +1064,7 @@ def fpydel_dblrcd(xllists, colv):
     lxll = len(xllists)
     xllists_ = []
     for i in range(0, lxll):
-        if xllists[i][11] == colv:
+        if xllists[i][coln] == colv:
             xllists_.append(xllists[i])
         else:
             continue
@@ -926,19 +1075,23 @@ def fpydel_dblrcd(xllists, colv):
 """
 fpylisttoxls: 
     listのデータをexcelfileに移行する
-    ｖ1.01
-    2022/4/3
+    ｖ2.0
+    2022/7/28
     @author: jicc
     
 """
-def fpylisttoxls(xllist, wbN, sheetN):
+def fpylisttoxls(xllist, fstcol, wbN, sheetN):
     """
     listのデータをexcelfileに移行する
+    開始行　sheet.max_row + 1
+    開始列 fstcol
 
     Parameters
     ----------
     xllist : str
-        original csvfile  'MH_???_History.csv'
+        list from original csvfile  'MH_???_History.csv'
+    fstcol : int
+        first volumn number to input data
     wbN : str
         Excelfile to move History data  'MH_CowsHistory.xlsx'
     sheetN : str
@@ -950,28 +1103,79 @@ def fpylisttoxls(xllist, wbN, sheetN):
 
     """
     #from jiccModule import chghistory
-    import chghistory
+    #import chghistory
     #import openpyxl
     
-    wbobj = chghistory.fpyopenxl(wbN, sheetN)   #get Worksheet object
+    wbobj = fpyopenxl(wbN, sheetN)   #get Worksheet object
     wb = wbobj[0]
     sheet = wbobj[1]
     #wb = openpyxl.load_workbook(wbN)
     #sheet = wb[sheetN]
-    #max_row = sheet.max_row                     
-    
+    max_row = sheet.max_row                     
+    rn = max_row + 1 #first row to input records
     ln = len(xllist)
            #the length of the list xllist
     if ln > 0: #リストに要素がない場合を排除 v1.01 2022/4/3
         ln_ = len(xllist[0])   #the number of the xllist's list[0]
         for i in range(0, ln):
             for j in range(0, ln_):
-                sheet.cell(row=i+2, column=j+1).value = xllist[i][j]
-        #return 1
-    #else:
-        #return 0 #何もしないと以下にindent errorが出る2022/4/3
- 
+                sheet.cell(row=rn, column=j+fstcol).value = xllist[i][j]
+            rn = rn + 1
+            print('add a new transfer informatyon')
+    else:
+    	print(' xllist have no element!')
+        
     wb.save(wbN)        
+
+#fpylisttoxls_s############################################################
+"""
+fpylisttoxls: 
+    listのデータをexcelfileに移行する
+    ｖ2.0
+    2022/7/28
+    @author: jicc
+    
+"""
+def fpylisttoxls_s(xllist, fstcol, sheet):
+    """
+    listのデータをexcelfileに移行する
+    開始行　sheet.max_row + 1
+    開始列 fstcol
+    arguments 'wbN, sheetN' -> 'sheet' worksheetobject version 
+    
+    Parameters
+    ----------
+    xllist : str
+        list from original csvfile  'MH_???_History.csv'
+    fstcol : int
+        first volumn number to input data
+   sheet : worksheet.worksheet.Worksheet
+        worksheet object
+
+    Returns
+    -------
+    None.
+
+    """
+    #import chghistory
+    #import openpyxl
+    
+    max_row = sheet.max_row                     
+    rn = max_row + 1 #first row to input records
+    ln = len(xllist)
+           #the length of the list xllist
+    if ln > 0: #リストに要素がない場合を排除 v1.01 2022/4/3
+        ln_ = len(xllist[0])   #the number of the xllist's list[0]
+        for i in range(0, ln):
+            for j in range(0, ln_):
+                sheet.cell(row=rn, column=j+fstcol).value = xllist[i][j]
+            rn = rn + 1
+            print('add a new transfer informatyon')
+    else:
+    	print(' xllist have no element!')
+        
+    #wb.save(wbN)
+
 
 #fpychk_drecords#########################################################
 """
@@ -1010,9 +1214,9 @@ def fpychk_drecords(wbN, sheetN):
     #重複データのflagを0->1に変更する
     xllists_01 = fpyflag_dblrcd_1(xllists_0)
     #重複データのないlist
-    xllists0 = fpydel_dblrcd(xllists_01, 0)
+    xllists0 = fpydel_dblrcd(xllists_01, 11, 0)
     #重複していたデータのリスト
-    xllists1 = fpydel_dblrcd(xllists_01, 1)
+    xllists1 = fpydel_dblrcd(xllists_01, 11, 1)
    
     xllists0 = fpydelclm_frm_lsts_lst(xllists0, 11) 
     #col 'flag'の削除
@@ -1023,12 +1227,520 @@ def fpychk_drecords(wbN, sheetN):
     #シート名の変更
     fpychgSheetTitle(wbN, sheetN, sheetN + 'org')
     #振り分け用のシート　KTFarm　と　KTFarmout　を作成する。
-    fpyNewSheet(wbN, sheetN, 'columns')
-    fpyNewSheet(wbN, sheetN + 'out', 'columns')
+    fpyNewSheet(wbN, sheetN, 'columns', 1)
+    fpyNewSheet(wbN, sheetN + 'out', 'columns', 1)
     #データを振り分ける
-    fpylisttoxls( xllists0, wbN, sheetN)
-    fpylisttoxls( xllists1, wbN, sheetN + 'out') 
+    
+    fpylisttoxls( xllists0, 1, wbN, sheetN)
+    fpylisttoxls( xllists1, 1, wbN, sheetN + 'out')
+    
 
+#fpyreplace_str#########################################################
+"""
+fpyreplace_str : replace str to another str
+    v1.0
+    2022/7/12
+    @author: jicc
+    
+"""
+def fpyreplace_str(text, txt0, txt1):
+    '''
+    replace str to another str
+
+    Parameters
+    ----------
+    text : str
+     ex. abc\u3000def
+    txt0 : str
+        ex. \u3000
+    txt1 : str
+        ex. ' '
+
+    Returns
+    -------
+    txt
+    'abc def'
+
+    '''
+
+    txt = text.replace(txt0, txt1)
+    
+    return txt
+
+#fpylstelemreplace_str#####################################################
+"""
+fpylstelemreplace_str : replace str to another str in a list's list
+    v1.0
+    2022/7/13
+    @author: jicc
+    
+"""
+def fpylstelemreplace_str(lst, elem, txt0, txt1):
+    '''
+    replace str to another str in a list's list
+
+    Parameters
+    ----------
+    lst : list's list
+     [[...], [...], ...]
+     
+    elem : int
+        an element No of the target element to replace str 
+    txt0 : str
+        ex. \u3000
+    txt1 : str
+        ex. ' '
+
+    Returns
+    -------
+    lst
+
+    '''
+    l = len(lst)
+    for i in range(0, l):
+
+        lst[i][elem] = fpyreplace_str(lst[i][elem], txt0, txt1)
+
+    return lst
+
+#fpyselect_newrecords#######################################################
+"""
+fpyselect_newrecords   :select new records from transfer information
+    異動情報から、新しいレコードを選択する
+v1.0
+2022/7/16
+
+@author: inoue
+"""
+def fpyselect_newrecords(wbN, sheetN, ncol, idno):
+    """
+    select new records from transfer information
+    異動情報から、新しいレコードを選択する
+    Parameters
+    ----------
+    wbN : str
+        Excelfile to check double data  'cowshistory.xlsx'
+    sheetN : str
+        sheet name of cowshistory   '??Farm'
+    ncol :  int
+        columns number of Excelfile's list
+    idno : str
+        ex. "0123456789"
+
+    Returns
+    -------
+    lists' list　 [[title], [newrecords], [overlapped records]]
+
+    """
+    #import chghistory
+    import nlbcs
+    import time
+    
+    #excelfileのデータをlists'listにする
+    xllists = fpyxllist_to_indlist(wbN, sheetN, ncol, idno)
+    #氏名の全角空白'u\3000'を' 'に変換する
+    xllists = fpylstelemreplace_str(xllists, 10, '\u3000', ' ')
+   
+    #個体識別情報検索画面のオープン
+    driver = nlbcs.fpyopen_url("https://www.id.nlbc.go.jp/CattleSearch/search/agreement")
+    nlbcs.fpyname_click(driver, "method:goSearch") 
+    #個体識別番号 idno の情報を検索し、[[個体情報+異動情報], ...]
+    #lists'list[[個体情報+異動情報], ...]を得る
+    trs_inf = nlbcs.fpytrsinf_to_list(driver, idno)
+
+    #lists' list [[title], [newrecords], [overlapped records]]
+    trs_inf01 = [] #default
+    
+    #value"0"のカラムflagをすべてのリストに追加する
+    trs_inf_0 = fpyaddclm_to_lsts_lst(trs_inf, 0)
+
+    #xllistsにすでにあるlistのflagを0->1に変更する
+    trs_inf_01 = fpyflag_dblrcd_1_(xllists, trs_inf_0)
+
+    #list of new records
+    trs_inf0 = fpydel_dblrcd(trs_inf_01, 10, 0)
+
+    #list of overlapped records
+    trs_inf1 = fpydel_dblrcd(trs_inf_01, 10, 1)
+
+    #delete col 'flag'
+    trs_inf0 = fpydelclm_frm_lsts_lst(trs_inf0, 10)
+
+    #delete col 'flag'
+    trs_inf1 = fpydelclm_frm_lsts_lst(trs_inf1, 10)
+     
+    trs_inf01.append(trs_inf0[0])  #[[title]]
+    trs_inf01.append(trs_inf0[1:]) #[[title], [newrecords]]
+    trs_inf01.append(trs_inf1)     #[[title], [newrecords], [overlapped records]] 
+    print('trs_inf01')
+    print(trs_inf01)
+    
+    time.sleep(3)
+    nlbcs.fpydriver_quit(driver)
+    
+    return trs_inf01
+
+
+"""
+fpyselect_newrecords_s   :select new records from transfer information
+    異動情報から、新しいレコードを選択する
+    arguments 'wbN, sheetN' -> 'sheet' worksheetobject and 
+    add arguments 'driver' Webdriver object
+    
+v1.0
+2022/7/17
+
+@author: inoue
+"""
+def fpyselect_newrecords_s(driver, sheet, ncol, idno):
+    """
+    select new records from transfer information
+    異動情報から、新しいレコードを選択する
+    Parameters
+    ----------
+    driver : webdriver.chrome.webdriver.WebDriver
+        WebDriver object of selenium.webdriver.chrome.webdriver module
+    sheet : worksheet.worksheet.Worksheet
+         worksheet object
+    ncol :  int
+        the number of columns of sheet(Excelfile's list)
+    idno : str
+        ex. "0123456789"
+
+    Returns
+    -------
+    trs_inf01 : lists'list
+    [[title], [[newrecord],..], [[overlapped record],..]] 
+
+    """
+    #import chghistory
+    import nlbcs
+    import time
+    
+    #excelfileのデータをlists'listにする
+    xllists = fpyxllist_to_indlist_s(sheet, ncol, idno)
+
+    xllists = fpylstelemreplace_str(xllists, 10, '\u3000', ' ')
+        
+    trs_inf = nlbcs.fpytrsinf_to_list(driver, idno)
+    #time.sleep(3)
+    #lists' list [[title], [[newrecord],..], [[overlapped record],..]] 
+    trs_inf01 = [] #default
+    #value"0"のカラムflagをすべてのリストに追加する
+    trs_inf_0 = fpyaddclm_to_lsts_lst(trs_inf, 0)
+    
+    #xllistsにすでにあるlistのflagを0->1に変更する
+    trs_inf_01 = fpyflag_dblrcd_1_(xllists, trs_inf_0)
+    
+    #list of new records
+    trs_inf0 = fpydel_dblrcd(trs_inf_01, 10, 0)
+    
+    #list of overlapped records
+    trs_inf1 = fpydel_dblrcd(trs_inf_01, 10, 1)
+    
+    #delete col 'flag'
+    trs_inf0 = fpydelclm_frm_lsts_lst(trs_inf0, 10)
+    
+    #delete col 'flag'
+    trs_inf1 = fpydelclm_frm_lsts_lst(trs_inf1, 10)
+        
+    trs_inf01.append(trs_inf0[0])  #[[title]]
+    trs_inf01.append(trs_inf0[1:]) #[[title], [[newrecords],..]]
+    trs_inf01.append(trs_inf1)     
+    #[[title], [[newrecord],..], [[overlapped record],..]] 
+    #print('trs_inf01')
+    #print(trs_inf01)
+    
+    time.sleep(3)
+    #nlbcs.fpydriver_quit(driver)
+    
+    return trs_inf01
+    #trs_inf[1] : newrecords, trs_inf[2] : overlapped records
+    
+#fpynewtrs_inf_to_list#####################################################
+"""
+fpynewtrs_inf_to_list:
+    compare original taransfer information with new information and
+    separate new recors and overlapped records
+    v1.0
+    2022/7/22
+    @author: jicc
+    
+"""
+def fpynewtrs_inf_to_list(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1):
+    """
+    compare original taransfer information with new information and
+    separate new recors and overlapped records
+
+    Parameters
+    ----------
+    wbN0 : str
+        Excelfile name of originaldata
+        ex. "cowhistory.xlsx"
+    sheetN0 : str
+        sheet name
+        ex. "MHFarm"
+    colidno0 : int
+        column number of 'idno0'(sheetN0 original data)
+    
+    wbN1 : str
+        Excelfile name of new information
+        ex. "??_cowslist.xlsx"
+    sheetN1 : str
+        sheet name
+        ex. "cowslist"
+    colidno1 : int
+        column number of 'idno1' (sheetN1 new data)
+
+    Returns
+    -------
+    trs_inf01 : lists'list
+    [[newrecors'list], [overlappedrecords'list]]
+    no title list
+
+    """
+    import nlbcs
+    #import chghistory
+    import time
+    from selenium.common.exceptions import NoSuchElementException
+    
+    wb0 = fpyopenxl(wbN0, sheetN0)
+    sheet0 = wb0[1]
+    #max_row0 = sheet0.max_row
+    
+    wb1 = fpyopenxl(wbN1, sheetN1)
+    sheet1 = wb1[1]
+    max_row1 = sheet1.max_row
+    
+    trs_inf0 = [] #new records lists'list default
+    trs_inf1 = [] #overlapped records lists'list default
+    trs_inf01 = [] #all records which have searched
+
+    driver = nlbcs.fpyopen_url("https://www.id.nlbc.go.jp/CattleSearch/search/agreement")
+    nlbcs.fpyname_click(driver, "method:goSearch") 
+    for row_num1 in range(2, max_row1 + 1):
+        
+        idno1 = fpygetCell_value(sheet1, row_num1, colidno1)
+        
+        try:
+            tmp = fpyselect_newrecords_s(driver, sheet0, 11, idno1)
+            #trs_inf0.append(tmp[0]) #columns list
+            trs_inf0.append(tmp[1]) #new records list
+            #trs_inf1.append(tmp[0]) #columns list
+            trs_inf1.append(tmp[2]) #overlapped records list
+
+        except NoSuchElementException:
+             print("Error: " + idno1 + " not found")
+                
+    trs_inf01 = [trs_inf0, trs_inf1]
+    #[[[newrecord],..], [[overlapped record],..]] 
+    
+    time.sleep(3)
+    nlbcs.fpydriver_quit(driver)
+    return trs_inf01
+
+#fpynewtrs_inf_to_list_s#####################################################
+"""
+fpynewtrs_inf_to_list_s:
+    compare original taransfer information with new information and
+    separate new recors and overlapped records
+    arguments 'wbN?, sheetN?' -> 'sheet?' worksheetobject version 
+    v1.0
+    2022/7/27
+    @author: jicc
+    
+"""
+def fpynewtrs_inf_to_list_s(sheet0, colidno0, sheet1, colidno1):
+    """
+    compare original taransfer information with new information and
+    separate new recors and overlapped records
+
+    Parameters
+    ----------
+    sheet0 : worksheet.worksheet.Worksheet
+         worksheet object
+    colidno0 : int
+        column number of 'idno0'(sheet0 original data ex.MHFarm)
+    sheet1 : worksheet.worksheet.Worksheet
+         worksheet object
+    colidno1 : int
+        column number of 'idno1' (sheet1 new data ex. "cowslist")
+
+    Returns
+    -------
+    trs_inf01 : lists'list
+    [[newrecors'list], [overlappedrecords'list]]
+    no title list
+
+    """
+    import nlbcs
+    #import chghistory
+    import time
+    from selenium.common.exceptions import NoSuchElementException
+    
+    max_row1 = sheet1.max_row
+    
+    trs_inf0 = [] #new records lists'list default
+    trs_inf1 = [] #overlapped records lists'list default
+    trs_inf01 = [] #all records which have searched
+
+    driver = nlbcs.fpyopen_url("https://www.id.nlbc.go.jp/CattleSearch/search/agreement")
+    nlbcs.fpyname_click(driver, "method:goSearch") 
+    for row_num1 in range(2, max_row1 + 1):
+        
+        idno1 = fpygetCell_value(sheet1, row_num1, colidno1)
+        
+        try:
+            tmp = fpyselect_newrecords_s(driver, sheet0, 11, idno1)
+            #trs_inf0.append(tmp[0]) #columns list
+            trs_inf0.append(tmp[1]) #new records list
+            #trs_inf1.append(tmp[0]) #columns list
+            trs_inf1.append(tmp[2]) #overlapped records list
+
+        except NoSuchElementException:
+             print("Error: " + idno1 + " not found")
+                
+    trs_inf01 = [trs_inf0, trs_inf1]
+    #[[[newrecord],..], [[overlapped record],..]] 
+    
+    time.sleep(3)
+    nlbcs.fpydriver_quit(driver)
+    return trs_inf01
+
+#fpytrs_infs_to_xlsx########################################################
+"""
+fpytrs_infs_to_xlsx:
+    search and save individual transfer informations to Excelfile
+    v1.0
+    2022/7/26
+    @author: jicc
+    
+"""
+def fpytrs_infs_to_xlsx(wbN0, sheetN0, wbN1, sheetN1, colidno1):
+    """
+    search and save individual transfer informations to Excelfile
+
+    Parameters
+    ----------
+    wbN0 : str
+        Excelfile name of originaldata
+        ex. "cowhistory.xlsx"
+    sheetN0 : str
+        sheet name
+        ex. "MHFarm"
+    wbN1 : str
+        Excelfile name of new idno information
+        ex. "??_cowslist.xlsx"
+    sheetN1 : str
+        sheet name
+        ex. "cowslist"
+    colidno1 : int
+        column number of 'idno1' (sheetN1 new data)
+
+    Returns
+    -------
+    None.
+
+    """
+    import nlbcs
+    #import chghistory
+    import time
+    from selenium.common.exceptions import NoSuchElementException
+    
+    wb0obj = fpyopenxl(wbN0, sheetN0) #[wb0, sheet0]
+    wb0 = wb0obj[0] #ex. cowshistory.xlsx
+    sheet0 = wb0obj[1] #ex. MHFarm
+    #max_row0 = sheet0.max_row
+    
+    wb1obj = fpyopenxl(wbN1, sheetN1) #[wb1, sheet1]
+    #wb1 = wb1obj[0] #ex. ??_cowslist.xlsx
+    sheet1 = wb1obj[1] #ex. cowslist
+    max_row1 = sheet1.max_row 
+    
+    driver = nlbcs.fpyopen_url("https://www.id.nlbc.go.jp/CattleSearch/search/agreement")
+    nlbcs.fpyname_click(driver, "method:goSearch") 
+    for row_num1 in range(2, max_row1 + 1):
+        
+        idno1 = fpygetCell_value(sheet1, row_num1, colidno1)
+        
+        try:
+
+            nlbcs.fpytrsinf_to_xlsx(driver, idno1, sheet0)            
+            
+        except NoSuchElementException:
+             print("Error: " + idno1 + " not found")
+    
+    wb0.save(wbN0)
+    time.sleep(3)
+    nlbcs.fpydriver_quit(driver)
+    
+#fpynewtrs_infs_to_xlsx######################################################    
+"""
+fpynewtrs_infs_to_xlsx : 
+    search individual transfer informations  
+    select new transfer informations
+    input and save Excelfile
+    v1.0
+    2022/7/28 @author: jicc
+    
+"""
+
+def fpynewtrs_infs_to_xlsx(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1):
+    """
+    search individual transfer informations  
+    select new transfer informations
+    input and save Excelfile    
+
+    Parameters
+    ----------
+    wbN0 : str
+        Excelfile name of originaldata
+        ex. "cowhistory.xlsx"
+    sheetN0 : str
+        sheet name
+        ex. "MHFarm"
+    colidno0 : int
+        column number of 'idno0' (sheetN0 )
+    wbN1 : str
+        Excelfile name of new idno information
+        ex. "??_cowslist.xlsx"
+    sheetN1 : str
+        sheet name
+        ex. "cowslist"
+    colidno1 : int
+        column number of 'idno1' (sheetN1 new data)
+
+    Returns
+    -------
+    None.
+
+    """
+
+    #import chghistory
+    
+    wb0obj = fpyopenxl(wbN0, sheetN0)
+    wb0 = wb0obj[0]
+    sheet0 = wb0obj[1]
+    #max_row0 = sheet0.max_row
+    
+    wb1obj = fpyopenxl(wbN1, sheetN1)
+    sheet1 = wb1obj[1]
+    #max_row1 = sheet1.max_row
+
+    trs_inf01 = \
+        fpynewtrs_inf_to_list_s(sheet0, colidno0, sheet1, colidno1)
+        
+    print('trs_inf01')
+    print(trs_inf01)
+        
+    trs_inf0 = trs_inf01[0] #newrecords
+    l0 = len(trs_inf0)
+    if l0 > 0:
+        for i in range(0, l0):
+            
+            fpylisttoxls_s(trs_inf0[i], 2, sheet0)
+            
+        wb0.save(wbN0)
            
 ######################################################################
 """
@@ -1039,7 +1751,7 @@ fpychghistoryReference:         reference of chbhistory's functions
 """
 def fpychghistoryReference():
     
-    print('-----chghistoryReference ---------------------------------------------------------v1.03------')
+    print('-----chghistoryReference ---------------------------------------------------------v1.05------')
     print('**fpyopenxl(wbN, sheetN)')
     print('Excelfile wbN.xlsx　sheet sheetN Open ')
     print('.............................................................................................')
@@ -1085,27 +1797,60 @@ def fpychghistoryReference():
     print('**fpyxllist_to_list(wbN, sheetN, ncol)')
     print('excelfileのリストを　lists\'　list にする')
     print('.............................................................................................')
+    print('**fpyxllist_to_indlist(wbN, sheetN, ncol, idno)')
+    print('get an individual lists\' list from excelfile\'s list')
+    print('.............................................................................................')
+    print('get an individual lists\' list from excelfile\'s list')
+    print('**fpyxllist_to_indlist_s(sheet, ncol, idno)')
+    print('arguments \'wbN, sheetN\' -> \'sheet\' worksheetobject version ')
+    print('.............................................................................................')
     print('**fpyaddclm_to_lsts_lst(xllists, colv)')
     print('lists\'listに最終カラムを追加する')
     print('.............................................................................................')
     print('**fpydelclm_frm_lsts_lst(xllists, col)')
     print('lists\'listのカラムを削除する')
     print('.............................................................................................')
-    print('**fpyflag_dblrcd_1(xllists)')
-    print('lists\'listの重複リストに　1（重複）でチェックを入れる')
+    print('**fpyflag_dblrcd_1_(xllists, trs_inf)')
+    print('2つのlists\'list　listorgとlisttmpを比較し、')
+    print('2つのlists\'listtmpの重複リストに　1（重複）でチェックを入れる')
     print('.............................................................................................')
-    print('**fpydel_dblrcd(xllists, colv)')
+    print('**fpydel_dblrcd(xllists, ,coln, colv)')
     print('lists\'listの重複リストの一つを削除する')
     print('.............................................................................................')
-    print('**fpylisttoxls(xllist, wbN, sheetN)')
+    print('**fpylisttoxls(xllist, fstcol, wbN, sheetN)')
     print('listのデータをexcelfileに移行する')
     print('....................................................................................')
     print('**fpychgSheetTitle(wbN, sheetN, sheetN1)')
     print('change ExcelSheet\'s title')
     print('....................................................................................')
-    print('**fpychk_drecords(wbN, sheetN)')
-    print('check doublue records 重複データを別シートに抜き出す')
-    print('--------------------------------------------------------------------2022/4/2 by jicc---------')
+    print('**fpyreplace_str(text, txt0, txt1)')
+    print('replace str to another str')
+    print('....................................................................................')
+    print('**fpylstelemreplace_str(lst, elem, txt0, txt1)')
+    print('replace str to another str in a list\'s list')
+    print('....................................................................................')
+    print('**fpyselect_newrecords(wbN, sheetN, ncol, idno)')
+    print('select new records from transfer information')
+    print('異動情報から、新しいレコードを選択する')
+    print('....................................................................................')
+    print('**fpyselect_newrecords_s(driver, sheet, ncol, idno)')
+    print('select new records from transfer information')
+    print('異動情報から、新しいレコードを選択する')
+    print('arguments \'wbN, sheetN\' -> \'sheet\' worksheetobject and ')
+    print('add arguments \'driver\' Webdriver object')
+    print('....................................................................................')
+    print('**fpynewtrs_inf_to_list(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1)')
+    print('compare original taransfer information with new information and')
+    print('separate new recors and overlapped records')
+    print('....................................................................................')
+    print('**fpytrs_infs_to_xlsx(wbN0, sheetN0, wbN1, sheetN1, colidno1)')
+    print('search and save individual transfer informations to Excelfile')
+    print('....................................................................................')
+    print('**fpynewtrs_infs_to_xlsx(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1)')
+    print('search individual transfer informations')
+    print('select new transfer informations')
+    print('input and save Excelfile ')
+    print('--------------------------------------------------------------------2022/7/28　by jicc---------')
     
     
 """
@@ -1119,7 +1864,7 @@ def fpyCowsHistoryManualfrmpdf():
     print('-----CowsHistoryManual from pdffile--------------------------------------------v1.01-------')
     print(' ')
     print(' \"牛の個体情報検索サービス-個体識別番号の検索\"から個体の異動情報を検索し、')
-    print('保存したpdffilesをExcelファイルにリスト化する。 ')
+    print('保存したpdffilesをcsvfileを介してExcelファイルにリスト化する。 ')
     print(' ')
     print('1.ディレクトリ内(..//CowsHistory)の特定の拡張子(.pdf)を持つファイルを見つけcsvfile に変換する')
     print('	MH_???_yyyymmdd.pdf -> ****.csv テーブル部分のデータ抽出')
@@ -1159,6 +1904,7 @@ def fpyCowsHistoryManualfrmweb():
     print(' ')
     print('\"牛の個体情報検索サービス-個体識別番号の検索\"から個体の異動情報を検索し、 ')
     print('Excelファイルにリスト化する。 ')
+    print('web -> csvfile ->Excelfile ')
     print(' ')
     print('1. ABFarmの個体リスト(AB_cowslist.xlsx/ABFarm)から、個体識別番号(colum2 idno)によって、')
     print('個体情報+異動情報を検索し、リストにし、idno_ymd.csv fileに保存する')

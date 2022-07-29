@@ -143,12 +143,17 @@ def fpyidno_search(driver, idno):
     None.
 
     '''
-    
+    #import time
+    #from selenium.common.exceptions import NoSuchElementException
+    #try:
     idno_elem = driver.find_element_by_name("txtIDNO")
     idno_elem.send_keys(idno) #0861094620　1577804244
     #idno_elem.submit()..this is impossible! 
     search_elem = driver.find_element_by_name("method:doSearch")
     search_elem.click()
+    #except NoSuchElementException:
+    #    print("Error: " + idno + " not found")
+    #    time.sleep(3)
     
 #fpynowDate_s00
 """
@@ -265,6 +270,7 @@ def fpyidno_search_results(driver):
         isresults.append(idno_search_results[i].text)
     
     return isresults
+    
 
 #fpyind_inf
 """
@@ -294,11 +300,15 @@ def fpyind_inf(isresults):
     import chghistory
     
     ind_inf = []
+    
+    #if isresults != []:
     ind_inf.append(isresults[0:5])  #columns' name
     ind_inf.append(isresults[5:10]) #individual information
     
     date = ind_inf[1][1] #1
     ind_inf[1][1] = chghistory.fpydate_dottoslash( date ) #1
+    #else:
+    #    ind_inf = ["idNo = ????"]
     
     return ind_inf
 
@@ -306,8 +316,8 @@ def fpyind_inf(isresults):
 """
 fpytrs_inf:
     get a list of transfer information
-    v1.01
-    2022/7/1
+    v1.02
+    2022/7/12
     @author: jicc
     
 """
@@ -363,9 +373,14 @@ def fpytrs_inf(isresults, ind_inf):
         date = trs_inf_inddt[j][2]  #2
         trs_inf_inddt[j][2] = chghistory.fpydate_dottoslash( date ) #2
         
+        #join two elements [3] and [4] to element[3](address)
         address = trs_inf_inddt[j][3] + ' ' + trs_inf_inddt[j][4]
         del trs_inf_inddt[j][4]
         trs_inf_inddt[j][3] = address
+        
+        #replace '\u3000全角空白' to ' ' v1.02 2022/7/12
+        tmp = trs_inf_inddt[j][4].replace( '\u3000', ' ')
+        trs_inf_inddt[j][4] = tmp
     
     #print(trs_inf_inddt)
 
@@ -504,12 +519,119 @@ def fpyindtrsinf_to_csv(wbN, sheetN):
         time.sleep(2)
 
     fpydriver_quit(driver)
+
+#fpytrsinf_to_list
+"""
+fpytrsinf_to_list:
+     search and return individual transfer information to list
+    v1.01
+    2022/7/22
+    @author: jicc
     
+"""
+def fpytrsinf_to_list(driver,idno):
+    """
+    search and return individual transfer information to list
+
+    Parameters
+    ----------
+    driver : webdriver.chrome.webdriver.WebDriver
+    WebDriver object of selenium.webdriver.chrome.webdriver module
+    idno : str
+        ex. "0123456789"
+    
+    Returns
+    -------
+    trs_inf : list
+    
+    individual transfer information
+    
+    """
+    #import nlbcs
+    #import time
+    fpyidno_search(driver, idno )
+    #open the page of idno's transfer information
+    nowDate = fpynowDate_s00(driver) #*
+    print(nowDate) #*
+    print(idno) #*
+    #get nowDate if nowDate == None -> idNo not found...NoSuchElementException
+    #* v1.01 2022/7/22
+    isresults = fpyidno_search_results(driver)
+    #get a list of individual number search results
+    #print(isresults)
+    ind_inf = fpyind_inf(isresults)
+    #get a list of individual information
+    #print(ind_inf)
+    trs_inf = fpytrs_inf(isresults, ind_inf)
+    #get a list of transfer information
+    #print(trs_inf)
+    return trs_inf
+
+#fpytrsinf_to_xlsx
+"""
+fpytrsinf_to_xlsx:
+     search and save individual transfer information to Excelfile
+    v1.02
+    2022/7/26
+    @author: jicc
+    
+"""
+def fpytrsinf_to_xlsx(driver,idno, sheet):
+    """
+    search and save individual transfer information to Excelfile
+
+    Parameters
+    ----------
+    driver : webdriver.chrome.webdriver.WebDriver
+    WebDriver object of selenium.webdriver.chrome.webdriver module
+    idno : str
+        ex. "0123456789"
+    sheet : worksheet.worksheet.Worksheet
+         worksheet object
+    
+    Returns
+    -------
+    sheet : worksheet.worksheet.Worksheet
+         worksheet object
+         after this, we need to save this Excelfile
+         ex. wb.save("cowshistory.xlsx")
+   
+    """
+    #import nlbcs
+    import chghistory
+    
+    fpyidno_search(driver, idno )
+    #open the page of idno's transfer information
+    nowDate = fpynowDate_s00(driver)
+    print(nowDate) #*
+    print(idno) #*
+    
+    isresults = fpyidno_search_results(driver)
+    #get a list of individual number search results
+    #print(isresults)
+    ind_inf = fpyind_inf(isresults)
+    #get a list of individual information
+    #print(ind_inf)
+    trs_inf = fpytrs_inf(isresults, ind_inf)
+    #get a list of transfer information
+    print(trs_inf)
+    
+    l = len(trs_inf)    #trs_inf[1]~trs_inf[l-1]まで入力(trs_inf[0]:title) 
+    l0 = len(trs_inf[0]) #number of elements
+    max_row = sheet.max_row
+    i = max_row + 1
+    for j in range(1, l):   #trs_inf[1]~trs_inf[l-1]
+        for k in range(0, l0):  #trs_inf[j][0]~trs_inf[j][l0-1]
+                chghistory.fpyinputCell_value(sheet, i, k+2, trs_inf[j][k])
+                #column k+1:LineNo(None)
+        i = i + 1
+
+    return sheet
 
 #reference    
 def nlbcsReference():
     
-    print('-----nlbcsReference ---------------------------------------------------------v1.00------')
+    print('-----nlbcsReference ---------------------------------------------------------v1.01------')
     print('**fpyopen_url(url)')
     print('open a url and return a webdriver')
     print('.............................................................................................')
@@ -551,5 +673,9 @@ def nlbcsReference():
     print('**fpyindtrsinf_to_csv(wbN, sheetN)')
     print('individual transfer information to csv file')
     print('.............................................................................................')
-    
-    print('--------------------------------------------------------------------2022/7/2 by jicc---------')
+    print('**fpytrsinf_to_list(driver,idno)')
+    print('search and return individual transfer information to list')
+    print('.............................................................................................')
+    print('**fpytrsinf_to_xlsx(driver,idno, sheet)')
+    print('search and save individual transfer information to Excelfile')
+    print('--------------------------------------------------------------------2022/7/25 by jicc---------')
