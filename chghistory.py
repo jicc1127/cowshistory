@@ -1121,7 +1121,7 @@ def fpylisttoxls(xllist, fstcol, wbN, sheetN):
             for j in range(0, ln_):
                 sheet.cell(row=rn, column=j+fstcol).value = xllist[i][j]
             rn = rn + 1
-            print('add a transfer information')
+            print('add a new transfer informatyon')
     else:
     	print(' xllist have no element!')
         
@@ -1270,7 +1270,7 @@ def fpyreplace_str(text, txt0, txt1):
 #fpylstelemreplace_str#####################################################
 """
 fpylstelemreplace_str : replace str to another str in a list's list
-    v1.0
+    v1.02
     2022/7/13
     @author: jicc
     
@@ -1298,8 +1298,11 @@ def fpylstelemreplace_str(lst, elem, txt0, txt1):
     '''
     l = len(lst)
     for i in range(0, l):
-
-        lst[i][elem] = fpyreplace_str(lst[i][elem], txt0, txt1)
+        if lst[i][elem] == None:    #add if ~ else v1.01
+            lst[i][elem] = '' #if lst[i][elem]...Noneとなる 
+                              # lst[i][elem] -> '' に変更 v1.02
+        else:
+            lst[i][elem] = fpyreplace_str(lst[i][elem], txt0, txt1)
 
     return lst
 
@@ -1849,7 +1852,7 @@ def fpychghistoryReference():
     print('**fpynewtrs_infs_to_xlsx(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1)')
     print('search individual transfer informations')
     print('select new transfer informations')
-    print('input and save new transfer informations to Excelfile ')
+    print('input and save Excelfile ')
     print('--------------------------------------------------------------------2022/7/28　by jicc---------')
     
     
@@ -1935,27 +1938,8 @@ fpyCowsHistoryTools:                        tools
 """
 def fpyCowsHistoryTools():
     
-    print('-----CowsHistoryTools---------------------------------------------------------v2.00-------')
-    print('牛の個体情報検索サービス 個体識別番号の検索から個体の異動情報を検索し、')
-    print('Excelファイルにリスト化するための　Tool集')
-    print(' ')
-    print('#fpytrs_infs_to_xlsx(wbN0, sheetN0, wbN1, sheetN1, colidno1)')
-    print('個体リスト AB_cowslist/cowslistのidnoから個体異動情報を検索する')
-    print('個体情報リスト cowshistory.xlsx/ABFarmに新規または追加入力する')
-    print('   PS> ps_fpytrs_infs_to_xlsx_args.py wbN0 sheetN0 wbN1 sheetN1 colidno1')
-    print(' wbN0 : cowshistory.xlsx, sheetN0 : ABFarm, ')
-    print(' wbN1 : AB_cowslist.xlsx, sheetN1 : cowslist, colidno1 : 2 (column number fo idno1)')
-    print(' ')
-    print('#fpynewtrs_infs_to_xlsx(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1)')
-    print('個体リスト AB_cowslist/のidnoから個体異動情報を検索する')
-    print('個体情報リスト cowshistory.xlsx/ABFarmにない新しい情報を抽出する')
-    print(' cowshistory.xlsx/ABFarmに追加入力する')
-    print('   PS> ps_fpynewtrs_infs_to_xlsx_args.py wbN0 sheetN0 colidno0 wbN1 sheetN1 colidno1')
-    print('  wbN0 : cowshistory.xlsx, sheetN0 : ABFarm, colidno0 : 2 (column number fo idno0), ')
-    print(' wbN1 : AB_cowslist.xlsx, sheetN1 : cowslist, colidno1 : 2 (column number fo idno1)')
-    print(' ')
+    print('-----CowsHistoryTools---------------------------------------------------------v1.00-------')
     print('#fpychk_drecords(wbN, sheetN)')
-    print('Excel個体情報リスト cowshistory/ABFarmの重複データをを削除する')
-    print('   PS> ps_fpychk_drecords_args.py wbN sheetN')
-    print(' wbN: ..\\cowshistory.xlsx, sheetN:ABFarm')
-    print('---------------------------------------------------------------2022/7/29by jicc---------')    
+    print('   PS> ps_fpychk_drecords_args.py')
+    print(' wbN: ..\\KT_CowsHistory.xlsx, sheetN:KTFarm')
+    print('---------------------------------------------------------------2022/4/3 by jicc---------')    

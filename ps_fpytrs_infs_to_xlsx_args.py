@@ -14,5 +14,5 @@ colidno1 = int( sys.argv[5] )
 
 chghistory.fpytrs_infs_to_xlsx(wbN0, sheetN0, wbN1, sheetN1, colidno1)
 
-print( wbN1+ "/"  + sheetN1 + "の個体リストの個体異動情報を検索し" +  wbN1 + "/" + sheetN1  + " に入力しました。")
+print( wbN1+ "/"  + sheetN1 + "の個体リストの個体異動情報を検索し" +  wbN0 + "/" + sheetN0  + " に入力しました。")
  
