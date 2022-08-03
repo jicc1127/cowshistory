@@ -381,7 +381,15 @@ def fpytrs_inf(isresults, ind_inf):
         #replace '\u3000全角空白' to ' ' v1.02 2022/7/12
         tmp = trs_inf_inddt[j][4].replace( '\u3000', ' ')
         trs_inf_inddt[j][4] = tmp
-    
+    	#□tmpに if trs_inf_inddt[j][4] == None:
+    	#					trs_inf_inddt[j][4] = ''
+    	#				else:
+    	#					tmp = trs_inf_inddt[j][4].replace( '\u3000', ' ')
+    	#					trs_inf_inddt[j][4] = tmp
+    	# の処置はいらないか?　
+    	# trs_inf_inddt[j][4]にNull値があった場合、
+    	#AttributeError: 'NoneType' object has no attribute 'replace' が発生するかも？
+    	#2022/8/3
     #print(trs_inf_inddt)
 
     #ind_infを紐づけ
