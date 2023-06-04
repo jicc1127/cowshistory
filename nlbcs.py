@@ -6,8 +6,8 @@ import numpy as np
 """
 fpyopen_url:
     open a url and return a webdriver
-    v1.0
-    2022/6/29
+    v1.1   例外処理を追加
+    2023/6/3
     @author: jicc
     
 """
@@ -28,11 +28,20 @@ def fpyopen_url(url):
 
     """
     #from selenium import webdriver
+    from selenium.common.exceptions import SessionNotCreatedException
     
+    try:
+        driver = webdriver.Chrome()
+        
+    except SessionNotCreatedException:
+        print("chromedriverのversionがあっていません。")
     
-    driver = webdriver.Chrome()
-    driver.get(url)
-    return driver
+    try:    
+        driver.get(url)
+        return driver
+
+    except UnboundLocalError:
+        print("urlを取得できません")
 
 #fpydriver_quit
 """
@@ -622,7 +631,7 @@ def fpytrsinf_to_xlsx(driver,idno, sheet):
     #print(ind_inf)
     trs_inf = fpytrs_inf(isresults, ind_inf)
     #get a list of transfer information
-    print(trs_inf)
+    #print(trs_inf)
     
     l = len(trs_inf)    #trs_inf[1]~trs_inf[l-1]まで入力(trs_inf[0]:title) 
     l0 = len(trs_inf[0]) #number of elements

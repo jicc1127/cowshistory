@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, re
+import os, re     
 import tabula
 import openpyxl
 import csv
@@ -783,6 +783,47 @@ def fpyxllist_to_list(wbN, sheetN, ncol):
         xllist = []    
     return xllists
 
+#fpyxllist_to_list_s#########################################################
+"""
+fpyxllist_to_list_s: 
+    excelfileのリストを　lists'　list にする
+    sheet version
+    ｖ1.00
+    2022/9/26
+    @author: jicc
+    
+"""
+def fpyxllist_to_list_s(sheet, ncol):
+    """
+    excelfileのデータをlists'listにする
+    sheet version
+    Parameters
+    ----------
+    sheet : worksheet.worksheet.Worksheet
+         worksheet object 
+    ncol :  int
+        number of columns
+    Returns
+    -------
+    xllists : lists' list
+
+    """
+    #import chghistory
+    #import openpyxl
+    
+    xllist = []
+
+    xllists = []
+    for i in range(2, sheet.max_row+1):  #タイトル行は飛ばす
+        
+        for j in range(1,ncol+1):
+            coldata = sheet.cell(row=i, column=j).value
+            xllist.append(coldata)
+            
+        xllists.append(xllist)
+        xllist = []    
+    return xllists
+
 #fpyxllsit_to_indlist######################################################
 """
 fpyxllist_to_indlist:
@@ -876,6 +917,56 @@ def fpyxllist_to_indlist_s(sheet, ncol, idno):
         idno_ = fpygetCell_value(sheet, i, 2) 
         #excellist's idno column 2
         if idno_ == idno:
+            for j in range(1,ncol+1):
+                coldata = sheet.cell(row=i, column=j).value
+                xllist.append(coldata)
+            
+            xllists.append(xllist)
+            xllist = [] 
+            
+    return xllists
+
+#fpyxllist_to_indlist_s_######################################################
+"""
+fpyxllist_to_indlist_s_:
+    get an individual lists' list from excelfile's list
+    arguments 'wbN, sheetN' -> 'sheet' worksheetobject version
+    add Excel's rowNo to xllist[0]  *)   
+    ｖ1.00
+    2022/10/17
+    @author: jicc
+    
+"""
+def fpyxllist_to_indlist_s_(sheet, ncol, idno):
+    """
+    get an individual lists' list from excelfile's list
+    sheet version
+    add Excel's rowNo to xllist[0] *)
+    
+    Parameters
+    ----------
+    sheet : worksheet.worksheet.Worksheet
+         worksheet object
+    ncol :  int
+        number of columns
+    idno : str
+        ex. "0123456789"
+    Returns
+    -------
+    xllists : lists' list
+
+    """
+    #import chghistory
+  
+    max_row = sheet.max_row
+
+    xllist = []
+    xllists = []
+    for i in range(2, max_row+1):   #タイトル行は飛ばす
+        idno_ = fpygetCell_value(sheet, i, 2) 
+        #excellist's idno column 2
+        if idno_ == idno:
+            xllist.append(i) #xllist[0] : Excel's rowNo *)
             for j in range(1,ncol+1):
                 coldata = sheet.cell(row=i, column=j).value
                 xllist.append(coldata)
@@ -1091,7 +1182,7 @@ def fpylisttoxls(xllist, fstcol, wbN, sheetN):
     xllist : str
         list from original csvfile  'MH_???_History.csv'
     fstcol : int
-        first volumn number to input data
+        first column number to input data
     wbN : str
         Excelfile to move History data  'MH_CowsHistory.xlsx'
     sheetN : str
@@ -1129,7 +1220,7 @@ def fpylisttoxls(xllist, fstcol, wbN, sheetN):
 
 #fpylisttoxls_s############################################################
 """
-fpylisttoxls: 
+fpylisttoxls_s: 
     listのデータをexcelfileに移行する
     ｖ2.0
     2022/7/28
@@ -1148,7 +1239,7 @@ def fpylisttoxls_s(xllist, fstcol, sheet):
     xllist : str
         list from original csvfile  'MH_???_History.csv'
     fstcol : int
-        first volumn number to input data
+        first column number to input data
    sheet : worksheet.worksheet.Worksheet
         worksheet object
 
@@ -1170,10 +1261,12 @@ def fpylisttoxls_s(xllist, fstcol, sheet):
             for j in range(0, ln_):
                 sheet.cell(row=rn, column=j+fstcol).value = xllist[i][j]
             rn = rn + 1
-            print('add a new transfer informatyon')
+            #print('add a new transfer informatyon')　#2022/12/3 削除 *)
     else:
     	print(' xllist have no element!')
         
+    print('add  new data')  #2022/12/4 *) から変更
+    
     #wb.save(wbN)
 
 
@@ -1266,6 +1359,91 @@ def fpyreplace_str(text, txt0, txt1):
     txt = text.replace(txt0, txt1)
     
     return txt
+
+#fpydel_blanc###############################################################
+"""
+fpydel_blanc : delete a blanc character
+    v1.0
+    2022/9/13
+    @author: jicc
+    
+"""
+#import re
+def fpydel_blanc(text):
+    '''
+    delete a blanc character
+
+    Parameters
+    ----------
+    text : str
+     ex. abc\u3000def
+   
+    Returns
+    -------
+    txt
+    'abc def'
+
+    '''
+
+    text = re.sub(r"\s+", "", text)     #\s+ blanc regexp
+    
+    return text
+
+#fpydel_quote################################################################
+"""
+fpydel_quote : delete a single or double quote 
+    v1.0
+    2022/9/13
+    @author: jicc
+    
+"""
+#import re
+def fpydel_quote(text):
+    '''
+    delete a single or double quote 
+    Parameters
+    ----------
+    text : str
+     ex. 'abcdef',"abcdef"
+   
+    Returns
+    -------
+    text
+    abcdef
+
+    '''
+
+    text = re.sub("\'|\"", "", text)     
+    
+    return text
+
+#fpydel_hyphen###############################################################
+"""
+fpydel_hyphen : delete a hyphen
+    v1.0
+    2022/10/6
+    @author: jicc
+    
+"""
+#import re
+def fpydel_hyphen(text):
+    '''
+    delete a hyphen
+
+    Parameters
+    ----------
+    text : str
+     ex. abc-def
+    
+    Returns
+    -------
+    text
+
+    '''
+
+    text = re.sub(r'[-]', "", text)     
+    
+    return text
 
 #fpylstelemreplace_str#####################################################
 """
@@ -1744,6 +1922,63 @@ def fpynewtrs_infs_to_xlsx(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1):
             fpylisttoxls_s(trs_inf0[i], 2, sheet0)
             
         wb0.save(wbN0)
+        
+#fpydel_d_idNo###############################################################
+"""
+fpydel_d_idNo:
+    
+    delete double idNos from idNos' list
+    v1.0
+    2023/6/2
+    @author: inoue
+    
+"""
+def fpydel_d_idNo( wbN, sheetN ):
+    '''
+    delete double idNos from idNos' list
+
+    Parameters
+    ----------
+    wbN : str
+        Excelfile name of cows'list
+        ex. "AB_cowslist.xlsx"
+    sheetN : str
+        sheet name
+        ex. "ABFarm"
+
+    Returns
+    -------
+    None.
+
+    '''
+    #import openpyxl
+    
+    wb = openpyxl.load_workbook(wbN)
+    sheet = wb[sheetN]
+    max_row = sheet.max_row
+    #print( sheet.max_row )
+     
+    for row_num in range( 2, max_row + 1 ):       
+        
+        #get the cowidNo of row row_num col 2
+        cowidNo = sheet.cell(row=row_num, column=2).value
+        for i in range( row_num+1, max_row + 1 ):
+            cowidNo_ = sheet.cell(row=i, column=2).value
+            if cowidNo == cowidNo_:
+                sheet.delete_rows( i )
+                max_row = max_row - 1
+                print('delete row:'+ str(i))
+                print('sheet.max_row:' + str(sheet.max_row))
+                print('max_row:' + str(max_row))
+                print('row_num:' + str(row_num))
+                print('cowidNo' + cowidNo)
+                print('cowidNo_' + cowidNo_)
+            else:
+                continue
+        
+    wb.save(wbN)
+
+        
            
 ######################################################################
 """
@@ -1800,12 +2035,21 @@ def fpychghistoryReference():
     print('**fpyxllist_to_list(wbN, sheetN, ncol)')
     print('excelfileのリストを　lists\'　list にする')
     print('.............................................................................................')
+    print('**fpyxllist_to_list_s(sheet, ncol)')
+    print('excelfileのリストを　lists\'　list にする')
+    print('sheet version')
+    print('.............................................................................................')
     print('**fpyxllist_to_indlist(wbN, sheetN, ncol, idno)')
     print('get an individual lists\' list from excelfile\'s list')
     print('.............................................................................................')
     print('get an individual lists\' list from excelfile\'s list')
     print('**fpyxllist_to_indlist_s(sheet, ncol, idno)')
     print('arguments \'wbN, sheetN\' -> \'sheet\' worksheetobject version ')
+    print('.............................................................................................')
+    print('get an individual lists\' list from excelfile\'s list')
+    print('**fpyxllist_to_indlist_s_(sheet, ncol, idno)')
+    print('arguments \'wbN, sheetN\' -> \'sheet\' worksheetobject version ')
+    print('add Excel\'s rowNo to xllist[0]')
     print('.............................................................................................')
     print('**fpyaddclm_to_lsts_lst(xllists, colv)')
     print('lists\'listに最終カラムを追加する')
@@ -1828,6 +2072,15 @@ def fpychghistoryReference():
     print('....................................................................................')
     print('**fpyreplace_str(text, txt0, txt1)')
     print('replace str to another str')
+    print('....................................................................................')
+    print('**fpydel_blanc(text)')
+    print('delete a blanc character')
+    print('....................................................................................')
+    print('**fpydel_quote(text)')
+    print('delete a single or double quote ')
+    print('....................................................................................')
+    print('**fpydel_hyphen(text)')
+    print('delete a hyphen')
     print('....................................................................................')
     print('**fpylstelemreplace_str(lst, elem, txt0, txt1)')
     print('replace str to another str in a list\'s list')
@@ -1853,7 +2106,10 @@ def fpychghistoryReference():
     print('search individual transfer informations')
     print('select new transfer informations')
     print('input and save Excelfile ')
-    print('--------------------------------------------------------------------2022/7/28　by jicc---------')
+    print('....................................................................................')
+    print('**fpydel_d_idNo(wbN, sheetN)')
+    print('delete double idNos from idNos\' list')
+    print('--------------------------------------------------------------------2023/6/2　by jicc---------')
     
     
 """
@@ -1960,5 +2216,10 @@ def fpyCowsHistoryTools():
     print('#fpychk_drecords(wbN, sheetN)')
     print('Excel個体情報リスト cowshistory/ABFarmの重複データをを削除する')
     print('   PS> ps_fpychk_drecords_args.py wbN sheetN')
-    print(' wbN: ..\\cowshistory.xlsx, sheetN:ABFarm')
-    print('---------------------------------------------------------------2022/7/29by jicc---------')    
+    print(' wbN: ..\\AB_cowshistory.xlsx, sheetN:ABFarm')
+    print(' ')
+    print('#fpydel_d_idNo(wbN, sheetN)')
+    print('個体リスト AB_cowslist/ABFarmのidnoの重複データをを削除する')
+    print('   PS> ps_fpydel_d_idno_args.py wbN sheetN')
+    print(' wbN: ..\\AB_cowslist.xlsx, sheetN:ABFarm')
+    print('---------------------------------------------------------------2023/6/2 by jicc---------')    
