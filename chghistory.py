@@ -66,7 +66,8 @@ def fpyopencsv_robj(csvN):
     
     
     return filename_reader
-    
+
+#fpyopencsv_rdata    
 """
 fpyopencsv_rdata:
     csvfile Open for Reader data
@@ -85,7 +86,7 @@ def fpyopencsv_rdata(csvN):
 
     Returns
     -------
-    None.
+    filename_data : list's list 
 
     """
     #import csv
@@ -262,6 +263,44 @@ def fpychgSheetTitle(wbN, sheetN, sheetN1):
     wb.save(wbN)
  
 ####################################################from fmstls.py##########
+
+#fpymkd_path##############################################################
+"""
+fpymkd_path : 
+    make a directory  at current directory
+    #カレントディレクトリに　path名のディレクトリが存在しなければ作成する
+    v1.0
+    2023/9/2
+    @author: jicc
+"""
+def fpymkd_path( path ):
+    '''
+    make a directory  at current directory
+
+    Parameters
+    ----------
+    path : str
+        directory name 　ex. '.\csvhistory'
+    Returns
+    -------
+    None.
+
+    '''
+    import os
+    
+    #try:
+    
+    if os.path.exists( path ):
+        print( "既に存在するディレクトリです。")
+        #continue
+    else:
+            os.makedirs( path )
+        
+    #except FileExistsError:
+    #   print( "既に存在するディレクトリです。")
+
+
+#fpypdf_to_csv############################################################
 """
 fpypdf_to_csv
     convert ****.pdf to ****.csv file
@@ -523,6 +562,7 @@ def fpycsvidNo_9to10( idNo ):
     
     return idNo 
 
+#fpydate_dottoslash#########################################################
 """
 fpydate_dottoslash:
     date in a csvfile 'yyyy.mm.dd' to 'yyyy/mm/dd'
@@ -602,7 +642,7 @@ def fpyymd_csvtoCowsHistory_csv(Ext, Path, bckPath):
                 print( csvorgN + ' already exists') 
      
             
-            
+#fpyHistory_csvto_xlsx            
 """
 fpyHistory_csvto_xlsx:
     フォルダー内の???H.csv)を???CowsHistory.xlsxに移動する
@@ -656,7 +696,7 @@ def fpyHistory_csvto_xlsx(Ext, Path, bckPath, wbN, sheetN):
             #csvoriginalfile(csvodgN) を　フォルダーbckPathに移動
             #上書きできないので例外処理
 
-
+#fpystrtodatetime##########################################################
 """
 fpystrtodatetime : str'yyyy/mm/dd'をdatetime に変換する
 
@@ -683,7 +723,7 @@ def fpystrtodatetime( date ):
     date = datetime.datetime.strptime( date, '%Y/%m/%d')
     
     return date
-
+#fpyxlstrymdtodatetime######################################################
 """
 fpyxlstrymdtodatetime : Excel cell 'yyyy/mm/dd'をdatetimeに変換する
 
@@ -733,6 +773,47 @@ def fpyxlstrymdtodatetime(wbN, sheetN, col):
         
     wb.save(wbN)
 
+
+#fpyxlstrymdtodatetime_s####################################################
+"""
+fpyxlstrymdtodatetime_s: Excel cell 'yyyy/mm/dd'をdatetimeに変換する
+    sheet version
+
+v1.00
+2023/9/12
+
+@author: inoue
+"""
+def fpyxlstrymdtodatetime_s( sheet, col ):
+    """
+    Excel cell 'yyyy/mm/dd'をdatetimeに変換する
+
+    Parameters
+    ----------
+    sheet : worksheet.worksheet.Worksheet
+         worksheet object
+    col : int
+        書き換えする列
+
+    Returns
+    -------
+    sheet : worksheet.worksheet.Worksheet
+         worksheet object
+
+    """
+        
+    for i in range(2, sheet.max_row+1):
+        
+        date = fpygetCell_value(sheet, i, col)
+        if type(date) == str: #date = 'str'の場合datetimtに変換1.01
+        #if type(date) != datetime.datetime: #これではNoneセルでstopする
+            date = fpystrtodatetime( date )
+            fpyinputCell_value(sheet, i, col, date)
+        else:
+            continue
+            
+    return sheet
+        
 #fpyxllist_to_list#########################################################
 """
 fpyxllist_to_list: 
@@ -1876,7 +1957,7 @@ def fpynewtrs_infs_to_xlsx(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1):
     ----------
     wbN0 : str
         Excelfile name of originaldata
-        ex. "cowhistory.xlsx"
+        ex. "cowshistory.xlsx"
     sheetN0 : str
         sheet name
         ex. "MHFarm"
@@ -1982,7 +2063,7 @@ def fpydel_d_idNo( wbN, sheetN ):
            
 ######################################################################
 """
-fpychghistoryReference:         reference of chbhistory's functions
+fpychghistoryReference:         reference of chghistory's functions
 ｖ1.1
 2022/4/2
 @author: jicc
@@ -2222,4 +2303,9 @@ def fpyCowsHistoryTools():
     print('個体リスト AB_cowslist/ABFarmのidnoの重複データをを削除する')
     print('   PS> ps_fpydel_d_idno_args.py wbN sheetN')
     print(' wbN: ..\\AB_cowslist.xlsx, sheetN:ABFarm')
+    print('#fpymkd_path( path )')
+    print('make a directory  at current directory')
+    print('#カレントディレクトリに　path名のディレクトリが存在しなければ作成する')
+    print('   PS> ps_fpymkd_path_args.py path')
+    print(' path: .\\csvhistory, .\\bck etc')
     print('---------------------------------------------------------------2023/6/2 by jicc---------')    
