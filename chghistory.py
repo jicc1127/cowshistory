@@ -476,7 +476,10 @@ fpycsvlisttoxls:
     csvfileのデータをexcelfileに移行する
     死亡のテーブルを回避する処置を加えた
     ｖ1.01
-    2022/1/13　
+    2022/1/13
+    #1) 3,9,12列の年月日をdatetimeに変換　を追加
+    v1.02
+    2023/9/26
     @author: jicc
     
 """
@@ -487,7 +490,7 @@ def fpycsvlisttoxls(csvN, wbN, sheetN):
     Parameters
     ----------
     csvN : str
-        original csvfile  'MH_???_History.csv'
+        original csvfile  'MH_???_History.csv', '0123456789_yyyymmdd.csv'
     wbN : str
         Excelfile to move History data  'MH_CowsHistory.xlsx'
     sheetN : str
@@ -498,37 +501,52 @@ def fpycsvlisttoxls(csvN, wbN, sheetN):
     None.
 
     """
-    #import chghistory
+    import chghistory
     #import openpyxl
     
-    wbobj = fpyopenxl(wbN, sheetN)   #get Worksheet object
+    wbobj = chghistory.fpyopenxl(wbN, sheetN)   #get Worksheet object
     wb = wbobj[0]
     sheet = wbobj[1]
     #wb = openpyxl.load_workbook(wbN)
     #sheet = wb[sheetN]
     max_row = sheet.max_row                     
     
-    csvdata = fpyopencsv_rdata(csvN)     #list's list of the csvfile
+    csvdata = chghistory.fpyopencsv_rdata(csvN)     #list's list of the csvfile
     ln = len(csvdata)       #the length of the list csvdata
     ln_ = len(csvdata[0])   #the number of the csvdata's list[0]
     k = max_row
     for i in range(1, ln):
-        No = csvdata[i][5]  #死亡のとき、'異動内容「死亡」の'以下のデータを削除のため
+        No = csvdata[i][5]  #死亡のとき、'異動内容「死亡」の' 以下のデータを削除のため
         #* "1", "2", "異動内容「死亡」の"　strlength <=2 で振り分け　2022/1/13 ｖ1.01
         No_ln = len(No)      
         while (No_ln<=2):       #* #No==99まで可能
             for j in range(0, ln_+1):
-                if j== 0:
+                if j== 0:   #input the LineNo
                     sheet.cell(row=max_row+i, column=j+1).value = k
+                    #the first LineNo is k (row k+1)
+                    #最初のLineNoは　k　(k+1行)に等しい
                     #print(k)
                     k = k + 1
                 else:
+                    print(csvdata[i][j-1])
                     sheet.cell(row=max_row+i, column=j+1).value = \
                         csvdata[i][j-1]
+                        
                         #l = csvdata[i][j-1]
                         #print(l)
             break #*
             
+    #sheet 3列 '出生の年月日' 'yyyy/mm/dd' -> datetimeに変換  #1)
+    chghistory.fpyxlstrymdtodatetime_s( sheet, 3 )
+    print('sheet 3列 \'出生の年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
+    
+    #sheet 9列 '異動年月日' 'yyyy/mm/dd' -> datetimeに変換  #1)
+    chghistory.fpyxlstrymdtodatetime_s( sheet, 9 )
+    print('sheet 9列 \'異動年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
+    
+    #sheet 12列 '検索年月日' 'yyyy/mm/dd' -> datetimeに変換 #1)
+    chghistory.fpyxlstrymdtodatetime_s( sheet, 12 )
+    print('sheet 12列 \'検索年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
         
     wb.save(wbN)
 
@@ -665,9 +683,9 @@ def fpyHistory_csvto_xlsx(Ext, Path, bckPath, wbN, sheetN):
     bckPath : str
         file移動するフォルダーのpath
     wbN : str
-        Excelfile to move History data  'MH_CowsHistory.xlsx'
+        Excelfile to move History data  'AB_CowsHistory.xlsx'
     sheetN : str
-        sheet name to add data   'MHFarm' 
+        sheet name to add data   'ABFarm' 
 
     Returns
     -------
@@ -675,11 +693,14 @@ def fpyHistory_csvto_xlsx(Ext, Path, bckPath, wbN, sheetN):
 
     """
     
-    #import os, re
-    #import shutil
+    import os, re
+    import shutil
     #import chghistory
     fs = os.listdir(Path)
+    #Path(.\\ カレントディレクトリ)に含まれるファイル名とフォルダ名のリスト
     regex_ext = re.compile(Ext)
+    #Ext の　Regex(regular expression)オブジェクト
+    
     #print(regex_ext)
         
     for f in fs:
@@ -695,6 +716,7 @@ def fpyHistory_csvto_xlsx(Ext, Path, bckPath, wbN, sheetN):
                 print( f + ' already exists')
             #csvoriginalfile(csvodgN) を　フォルダーbckPathに移動
             #上書きできないので例外処理
+            #[ ]f(1).csvなどファイル名を変えて保存するなどに変更か
 
 #fpystrtodatetime##########################################################
 """
@@ -2061,7 +2083,7 @@ def fpydel_d_idNo( wbN, sheetN ):
 
         
            
-######################################################################
+#fpychghistoryReference###################################################################
 """
 fpychghistoryReference:         reference of chghistory's functions
 ｖ1.1
@@ -2248,8 +2270,8 @@ def fpyCowsHistoryManualfrmweb():
     print(' ')
     print('1. ABFarmの個体リスト(AB_cowslist.xlsx/ABFarm)から、個体識別番号(colum2 idno)によって、')
     print('個体情報+異動情報を検索し、リストにし、idno_ymd.csv fileに保存する')
-    print('   PS> ps_fpyindtrsinf_to_csv_args.py wbN sheetN')
-    print(' wbN : AB_cowslist.xlsx, sheetN : cowslist')
+    print('   PS> ps_fpyindtrsinf_to_csv_args.py wbN sheetN col')
+    print(' wbN : AB_cowslist.xlsx, sheetN : cowslist col:2')
     print('牛の個体情報検索サービス-個体識別番号の検索')
     print(' url : https://www.id.nlbc.go.jp/CattleSearch/search/agreement')
     print(' ')
@@ -2260,12 +2282,13 @@ def fpyCowsHistoryManualfrmweb():
     print(' Ext: \.csv, Path: .\\(カレントディレクトリ), bckPath: .\\csvhistory')
     print(' wbN: (..\\)cowshistory.xlsx, sheetN:ABFarm')
     print(' ')
-    print('3.cowshistory.xlsx\/ABFarm の　str\"yyyy\/mm\/dd\"を')
-    print('datetimeに変換する')
-    print('   PS> ps_fpyxlstrymdtodatetime_args.py wbN sheetN　col')
-    print(' wbN: ..\\KT_CowsHistory.xlsx, sheetN:KTFarm, col: 3 and 9')
-    print('---------------------------------------------------------------2022/7/11 by jicc---------')
+    print('---------------------------------------------------------------2023/9/26 by jicc---------')
     
+    #以下を削除 2023/9/26
+    #print('3.cowshistory.xlsx\/ABFarm の　str\"yyyy\/mm\/dd\"を')
+    #print('datetimeに変換する')
+    #print('   PS> ps_fpyxlstrymdtodatetime_args.py wbN sheetN　col')
+    #print(' wbN: ..\\KT_CowsHistory.xlsx, sheetN:KTFarm, col: 3 and 9')
     
 """
 fpyCowsHistoryTools:                        tools
@@ -2303,9 +2326,10 @@ def fpyCowsHistoryTools():
     print('個体リスト AB_cowslist/ABFarmのidnoの重複データをを削除する')
     print('   PS> ps_fpydel_d_idno_args.py wbN sheetN')
     print(' wbN: ..\\AB_cowslist.xlsx, sheetN:ABFarm')
+    print(' ')
     print('#fpymkd_path( path )')
     print('make a directory  at current directory')
-    print('#カレントディレクトリに　path名のディレクトリが存在しなければ作成する')
+    print('カレントディレクトリに　path名のディレクトリが存在しなければ作成する')
     print('   PS> ps_fpymkd_path_args.py path')
     print(' path: .\\csvhistory, .\\bck etc')
-    print('---------------------------------------------------------------2023/6/2 by jicc---------')    
+    print('---------------------------------------------------------------2023/9/27 by jicc---------')    
