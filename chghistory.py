@@ -299,6 +299,56 @@ def fpymkd_path( path ):
     #except FileExistsError:
     #   print( "既に存在するディレクトリです。")
 
+#fpymkxlsheet#############################################################
+"""
+fpymkxlsheet : make an ExcelSheet if it dose not exist
+v1.0
+2023/9/30
+
+@author: inoue
+"""
+def fpymkxlsheet(wbN, sheetN, scolN, r):
+    """
+    make an ExcelSheet if it dose not exist
+
+    Parameters
+    ----------
+    wbN : str
+        Excelfile to make a new sheet
+    sheetN : str
+        new sheet name  : 'ABFarmout'
+    scolN : str         シート名: "columns"
+        参照するシート
+	r : int		r行目 作成するcolumn行
+    
+    Returns
+    -------
+    None.
+
+    """
+    #import openpyxl
+    
+    wb = openpyxl.load_workbook(wbN)
+    #sheet = wbobj[1]
+    #sheet.title = sheetN1
+    snames = []
+    snames = wb.sheetnames #get_sheet_names()
+    print(snames)
+    
+    if sheetN not in snames:
+        wb.create_sheet(title=sheetN, index=0)
+        sheet = wb[sheetN]
+        scol = wb[scolN]
+        
+        maxcol = scol.max_column #sheet columnの最終列
+                
+        for i in range(1,maxcol+1):
+            sheet.cell(row=r, column=i).value = scol.cell(row=1, column=i).value
+        print("Sheet " +sheetN + " を作成しました。")
+    else:
+        print("Sheet " +sheetN + " exists")
+     
+    wb.save(wbN)
 
 #fpypdf_to_csv############################################################
 """
@@ -2212,7 +2262,13 @@ def fpychghistoryReference():
     print('....................................................................................')
     print('**fpydel_d_idNo(wbN, sheetN)')
     print('delete double idNos from idNos\' list')
-    print('--------------------------------------------------------------------2023/6/2　by jicc---------')
+    print('....................................................................................')
+    print('**fpymkd_path( path )')
+    print('make a directory  at current directory')
+    print('....................................................................................')
+    print('**fpymkxlsheet(wbN, sheetN, scolN, r)')
+    print('make an ExcelSheet if it dose not exist')
+    print('--------------------------------------------------------------------2023/9/30　by jicc---------')
     
     
 """
