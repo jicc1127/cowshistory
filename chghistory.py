@@ -2131,7 +2131,89 @@ def fpydel_d_idNo( wbN, sheetN ):
         
     wb.save(wbN)
 
+#fpyelems_lstfrmxls_lst######################################################
+"""
+fpyelems_lstfrmxls_lst : make an elements' list from Excel's list
+
+    v1.0
+    2023/10/1
+    @author: inoue
+"""
+def fpyelems_lstfrmxls_lst(wbN, sheetN, coln):
+    """
+    make an elements' list from Excel's list
+
+    Parameters
+    ----------
+    wbN : str
+        Excelfile to check double data  'AB_cowshistory.xlsx'
+    sheetN : str
+        sheet name to check some column 'ABFarm'
+    coln : int
+        column's number to check elements
+
+    Returns
+    -------
+    list
+
+    """
+    import chghistory
+    wbobj = chghistory.fpyopenxl(wbN, sheetN)
+    #wb = wbobj[0]
+    sheet = wbobj[1]
+    
+    #max_row = sheet.max_row
+
+    elements = []
+    for i in range(2, sheet.max_row+1):   #タイトル行は飛ばす
+        elem = fpygetCell_value(sheet, i, coln) 
+
+        if elem not in elements:
+            elements.append(elem)
+        else:
+            continue
+            #print(elem + "is a element of the list elements.")
+            
         
+    return elements
+
+#fpyelems_lstfrmxls_lst_s######################################################
+"""
+fpyelems_lstfrmxls_lst : make an elements' list from Excel's list
+    sheet version
+    v1.0
+    2023/10/1
+    @author: inoue
+"""
+def fpyelems_lstfrmxls_lst_s(sheet, coln):
+    """
+    make an elements' list from Excel's list
+
+    Parameters
+    ----------
+    sheet : worksheet.worksheet.Worksheet
+         worksheet object
+    coln : int
+        column's number to check elements
+
+    Returns
+    -------
+    list
+
+    """
+
+    elements = []
+    for i in range(2, sheet.max_row+1):   #タイトル行は飛ばす
+        elem = fpygetCell_value(sheet, i, coln) 
+
+        if elem not in elements:
+            elements.append(elem)
+        else:
+            continue
+            #print(elem + "is a element of the list elements.")
+            
+        
+    return elements        
            
 #fpychghistoryReference###################################################################
 """
@@ -2268,7 +2350,11 @@ def fpychghistoryReference():
     print('....................................................................................')
     print('**fpymkxlsheet(wbN, sheetN, scolN, r)')
     print('make an ExcelSheet if it dose not exist')
-    print('--------------------------------------------------------------------2023/9/30　by jicc---------')
+    print('....................................................................................')
+    print('**fpyelems_lstfrmxls_lst(wbN, sheetN, coln)')
+    print('  fpyelems_lstfrmxls_lst_s(sheet, coln)')
+    print('make an elements\' list from Excel\'s list')
+    print('--------------------------------------------------------------------2023/10/1　by jicc---------')
     
     
 """
