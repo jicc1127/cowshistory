@@ -654,6 +654,10 @@ fpytrsinf_to_xlsx:
      search and save individual transfer information to Excelfile
     v1.02
     2022/7/26
+    #1) 3,9,12列の年月日をdatetimeに変換　を追加
+    #2) LineNo 入力を追加
+    v1.03
+    2023/10/4
     @author: jicc
     
 """
@@ -678,22 +682,28 @@ def fpytrsinf_to_xlsx(driver,idno, sheet):
          ex. wb.save("cowshistory.xlsx")
    
     """
-    #import nlbcs
+    import nlbcs
     import chghistory
     
-    fpyidno_search(driver, idno )
+    nlbcs.fpyidno_search(driver, idno )
     #open the page of idno's transfer information
-    nowDate = fpynowDate_s00(driver)
+    nowDate = nlbcs.fpynowDate_s00(driver) #not necessary? 不要? 2023/10/4
+    print("nowDate")
     print(nowDate) #*
     print(idno) #*
     
-    isresults = fpyidno_search_results(driver)
+    nowDate_ = nlbcs.fpynowDate_s01(driver)
+    #get a nowDate_ with "yyyy/mm/dd" for a fillindate
+    print("nowDate_")
+    print(nowDate_)
+    
+    isresults = nlbcs.fpyidno_search_results(driver)
     #get a list of individual number search results
     #print(isresults)
-    ind_inf = fpyind_inf(isresults)
+    ind_inf = nlbcs.fpyind_inf(isresults)
     #get a list of individual information
     #print(ind_inf)
-    trs_inf = fpytrs_inf(isresults, ind_inf)
+    trs_inf = nlbcs.fpytrs_inf(isresults, ind_inf, nowDate_)
     #get a list of transfer information
     #print(trs_inf)
     
@@ -703,10 +713,25 @@ def fpytrsinf_to_xlsx(driver,idno, sheet):
     i = max_row + 1
     for j in range(1, l):   #trs_inf[1]~trs_inf[l-1]
         for k in range(0, l0):  #trs_inf[j][0]~trs_inf[j][l0-1]
+                chghistory.fpyinputCell_value(sheet, i, 1, i-1) #2)
+                #LineNo
                 chghistory.fpyinputCell_value(sheet, i, k+2, trs_inf[j][k])
                 #column k+1:LineNo(None)
         i = i + 1
-
+    
+    #sheet 3列 '出生の年月日' 'yyyy/mm/dd' -> datetimeに変換  #1)
+    chghistory.fpyxlstrymdtodatetime_s( sheet, 3 )
+    print('sheet 3列 \'出生の年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
+    
+    #sheet 9列 '異動年月日' 'yyyy/mm/dd' -> datetimeに変換  #1)
+    chghistory.fpyxlstrymdtodatetime_s( sheet, 9 )
+    print('sheet 9列 \'異動年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
+    
+    #sheet 12列 '検索年月日' 'yyyy/mm/dd' -> datetimeに変換 #1)
+    chghistory.fpyxlstrymdtodatetime_s( sheet, 12 )
+    print('sheet 12列 \'検索年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
+    
+    
     return sheet
 
 #reference    

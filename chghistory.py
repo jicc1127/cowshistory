@@ -1958,13 +1958,13 @@ def fpytrs_infs_to_xlsx(wbN0, sheetN0, wbN1, sheetN1, colidno1):
     ----------
     wbN0 : str
         Excelfile name of originaldata
-        ex. "cowhistory.xlsx"
+        ex. "AB_cowhistory.xlsx"
     sheetN0 : str
         sheet name
-        ex. "MHFarm"
+        ex. "ABFarm"
     wbN1 : str
         Excelfile name of new idno information
-        ex. "??_cowslist.xlsx"
+        ex. "AB_cowslist.xlsx"
     sheetN1 : str
         sheet name
         ex. "cowslist"
@@ -1982,12 +1982,12 @@ def fpytrs_infs_to_xlsx(wbN0, sheetN0, wbN1, sheetN1, colidno1):
     from selenium.common.exceptions import NoSuchElementException
     
     wb0obj = fpyopenxl(wbN0, sheetN0) #[wb0, sheet0]
-    wb0 = wb0obj[0] #ex. cowshistory.xlsx
-    sheet0 = wb0obj[1] #ex. MHFarm
+    wb0 = wb0obj[0] #ex. AB_cowshistory.xlsx
+    sheet0 = wb0obj[1] #ex. ABFarm
     #max_row0 = sheet0.max_row
     
     wb1obj = fpyopenxl(wbN1, sheetN1) #[wb1, sheet1]
-    #wb1 = wb1obj[0] #ex. ??_cowslist.xlsx
+    #wb1 = wb1obj[0] #ex. AB_cowslist.xlsx
     sheet1 = wb1obj[1] #ex. cowslist
     max_row1 = sheet1.max_row 
     
@@ -2449,7 +2449,7 @@ def fpyCowsHistoryTools():
     print('個体情報リスト cowshistory.xlsx/ABFarmに新規または追加入力する')
     print('   PS> ps_fpytrs_infs_to_xlsx_args.py wbN0 sheetN0 wbN1 sheetN1 colidno1')
     print(' wbN0 : cowshistory.xlsx, sheetN0 : ABFarm, ')
-    print(' wbN1 : AB_cowslist.xlsx, sheetN1 : cowslist, colidno1 : 2 (column number fo idno1)')
+    print(' wbN1 : AB_cowslist.xlsx, sheetN1 : cowslist, colidno1 : 2 (column number of idno1)')
     print(' ')
     print('#fpynewtrs_infs_to_xlsx(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1)')
     print('個体リスト AB_cowslist/のidnoから個体異動情報を検索する')
