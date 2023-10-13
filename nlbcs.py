@@ -607,6 +607,10 @@ fpytrsinf_to_list:
      search and return individual transfer information to list
     v1.01
     2022/7/22
+    #* 'nowDate_' yyyy/mm/dd 検索年月日　追加
+    #** fpytrs_inf : add a parameter 'nowDate_'
+    v1.01
+    2023/10/5
     @author: jicc
     
 """
@@ -620,7 +624,7 @@ def fpytrsinf_to_list(driver,idno):
     WebDriver object of selenium.webdriver.chrome.webdriver module
     idno : str
         ex. "0123456789"
-    
+        
     Returns
     -------
     trs_inf : list
@@ -632,8 +636,10 @@ def fpytrsinf_to_list(driver,idno):
     #import time
     fpyidno_search(driver, idno )
     #open the page of idno's transfer information
-    nowDate = fpynowDate_s00(driver) #*
-    print(nowDate) #*
+    #nowDate = fpynowDate_s01(driver) #*
+    #print(nowDate)
+    nowDate_ = fpynowDate_s01(driver) #*
+    print(nowDate_) #*
     print(idno) #*
     #get nowDate if nowDate == None -> idNo not found...NoSuchElementException
     #* v1.01 2022/7/22
@@ -643,7 +649,7 @@ def fpytrsinf_to_list(driver,idno):
     ind_inf = fpyind_inf(isresults)
     #get a list of individual information
     #print(ind_inf)
-    trs_inf = fpytrs_inf(isresults, ind_inf)
+    trs_inf = fpytrs_inf(isresults, ind_inf, nowDate_)  #**
     #get a list of transfer information
     #print(trs_inf)
     return trs_inf

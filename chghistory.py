@@ -1236,12 +1236,16 @@ def fpyflag_dblrcd_1(xllists):
             
     return xllists 
 
+#fpyflag_dblrcd_1_###########################################################
 """
 fpyflag_dblrcd_1_ : flag double record 1
    2つのlists'list　listorgとlisttmpを比較し、
    listtmpの重複リストに　1（重複）でチェックを入れる
    v1.0
    2022/7/15
+   *)[1:]->[1:11] LineNo, 検索年月日をのぞいたリストの一致
+   v1.01
+   2023/10/5
    @author: jicc
    
 """
@@ -1265,12 +1269,15 @@ def fpyflag_dblrcd_1_(xllists, trs_inf):
     """
     lxll = len(xllists)
     ltrs = len(trs_inf)
-    
+    #print("xllists")
+    #print(xllists)
+    #print("trs_inf")
+    #print(trs_inf)
     for i in range(1, ltrs):    #columns' list skip
         for j in range(0, lxll):
             #print(xllists[j])
-            if trs_inf[i][0:10] == xllists[j][1:]:
-                trs_inf[i][10] = 1
+            if trs_inf[i][0:10] == xllists[j][1:11]:    #*)[1:]->[1:11] 
+                trs_inf[i][11] = 1
             else:
                 continue
             
@@ -1279,7 +1286,7 @@ def fpyflag_dblrcd_1_(xllists, trs_inf):
 #fpydel_dblrcd##############################################################
 """
 fpydel_dblrcd : delete double record
-   lists'listの重複リストの一つを削除する
+   lists'listの重複リストか新リストのどちらかを削除する
    add argument coln v1.01 2022/7/16
    v1.01
    2022/7/16
@@ -1288,7 +1295,7 @@ fpydel_dblrcd : delete double record
 """
 def fpydel_dblrcd(xllists, coln, colv):
     """
-    lists'listの重複リストの一つを削除する
+    lists'listの重複リストか新リストのどちらかを削除する
     
     Parameters
     ----------
@@ -1301,7 +1308,7 @@ def fpydel_dblrcd(xllists, coln, colv):
 
     Returns
     -------
-    重複リストに "1"を追加した　lists'list 
+    lists'list : xllists[?][coln](flag)==colv only　
 
     """
     
@@ -1371,16 +1378,69 @@ def fpylisttoxls(xllist, fstcol, wbN, sheetN):
         
     wb.save(wbN)        
 
-#fpylisttoxls_s############################################################
+#fpylisttoxls_s###########################################################
 """
 fpylisttoxls_s: 
     listのデータをexcelfileに移行する
     ｖ2.0
     2022/7/28
+    
     @author: jicc
     
 """
 def fpylisttoxls_s(xllist, fstcol, sheet):
+    """
+    listのデータをexcelfileに移行する
+    開始行　sheet.max_row + 1
+    開始列 fstcol
+    arguments 'wbN, sheetN' -> 'sheet' worksheetobject version 
+    
+    Parameters
+    ----------
+    xllist : str
+        list from original csvfile  'MH_???_History.csv'
+    fstcol : int
+        first column number to input data
+   sheet : worksheet.worksheet.Worksheet
+        worksheet object
+
+    Returns
+    -------
+    None.
+
+    """
+    #import chghistory
+    #import openpyxl
+    
+    max_row = sheet.max_row                     
+    rn = max_row + 1 #first row to input records
+    ln = len(xllist)   #count the number of xllist's elements
+    if ln > 0: #リストに要素がない場合を排除 v1.01 2022/4/3
+        for i in range(0, ln):
+            sheet.cell(row=rn, column=i+fstcol).value = xllist[i]
+        rn = rn + 1
+            #print('add a new transfer information')　#2022/12/3 削除 *)
+    else:
+    	print(' xllist have no element!')
+        
+    print('add  new data')  #2022/12/4 *) から変更
+    
+    #return sheet
+    #wb.save(wbN)
+
+
+#fpylisttoxls_s_############################################################
+"""
+fpylisttoxls_s_: 
+    listのデータをexcelfileに移行する
+    ｖ2.0
+    2022/7/28
+    @author: jicc
+    #cowshistory 以外で飼養していた場合を考えて fpylisttoxls_s_ として保存
+    2023/10/13
+    
+"""
+def fpylisttoxls_s_(xllist, fstcol, sheet):
     """
     listのデータをexcelfileに移行する
     開始行　sheet.max_row + 1
@@ -1714,15 +1774,17 @@ def fpyselect_newrecords(wbN, sheetN, ncol, idno):
     
     return trs_inf01
 
-
+#fpyselect_newrecords_s#####################################################
 """
 fpyselect_newrecords_s   :select new records from transfer information
     異動情報から、新しいレコードを選択する
     arguments 'wbN, sheetN' -> 'sheet' worksheetobject and 
     add arguments 'driver' Webdriver object
-    
-v1.0
-2022/7/17
+    v1.0
+    2022/7/17
+    #*  change str yyyy/0m/0d to datetime yyyy/m/d
+    v1.01
+    2023/10/7
 
 @author: inoue
 """
@@ -1747,36 +1809,56 @@ def fpyselect_newrecords_s(driver, sheet, ncol, idno):
     [[title], [[newrecord],..], [[overlapped record],..]] 
 
     """
-    #import chghistory
+    import chghistory
     import nlbcs
-    import time
+    #import time
+    import fmstls
     
     #excelfileのデータをlists'listにする
-    xllists = fpyxllist_to_indlist_s(sheet, ncol, idno)
-
-    xllists = fpylstelemreplace_str(xllists, 10, '\u3000', ' ')
-        
+    xllists = chghistory.fpyxllist_to_indlist_s(sheet, ncol, idno)
+    #print("xllists")
+    #print(xllists)
+    xllists = chghistory.fpylstelemreplace_str(xllists, 10, '\u3000', ' ')
+    #list 10(11番目)の"氏名または名称"の全角空白を半角空白に変換 
+    #print('xllists')
+    #print(xllists)    
     trs_inf = nlbcs.fpytrsinf_to_list(driver, idno)
-    #time.sleep(3)
-    #lists' list [[title], [[newrecord],..], [[overlapped record],..]] 
+    #lists' list [[title], [[newrecord],..], [[overlapped record],..]]
+    
+    l = len(trs_inf)
+    for i in range(1,l): #*
+            #出生の年月日 yyyy/0m/0d ->yyyy/m/d
+            yyyy_mm_dd_0 = fmstls.fpyymd_0mtom_0dtod_(trs_inf[i][1])
+            trs_inf[i][1] = yyyy_mm_dd_0
+            #異動年月日 yyyy/0m/0d ->yyyy/m/d
+            yyyy_mm_dd_1 = fmstls.fpyymd_0mtom_0dtod_(trs_inf[i][7])
+            trs_inf[i][7] = yyyy_mm_dd_1
+            #検索年月日 yyyy/0m/0d ->yyyy/m/d
+            yyyy_mm_dd_2 = fmstls.fpyymd_0mtom_0dtod_(trs_inf[i][10])
+            trs_inf[i][10] = yyyy_mm_dd_2                               #*
+    
+    #print('trs_inf')
+    #print(trs_inf)
+    
     trs_inf01 = [] #default
     #value"0"のカラムflagをすべてのリストに追加する
-    trs_inf_0 = fpyaddclm_to_lsts_lst(trs_inf, 0)
+    #titleリストの最後にも0が追加されている
+    trs_inf_0 = chghistory.fpyaddclm_to_lsts_lst(trs_inf, 0)
     
     #xllistsにすでにあるlistのflagを0->1に変更する
     trs_inf_01 = fpyflag_dblrcd_1_(xllists, trs_inf_0)
     
-    #list of new records
-    trs_inf0 = fpydel_dblrcd(trs_inf_01, 10, 0)
+    #list of new records　[[title], [newrecord], ...]
+    trs_inf0 = chghistory.fpydel_dblrcd(trs_inf_01, 11, 0)
     
     #list of overlapped records
-    trs_inf1 = fpydel_dblrcd(trs_inf_01, 10, 1)
+    trs_inf1 = chghistory.fpydel_dblrcd(trs_inf_01, 11, 1)
     
     #delete col 'flag'
-    trs_inf0 = fpydelclm_frm_lsts_lst(trs_inf0, 10)
+    trs_inf0 = chghistory.fpydelclm_frm_lsts_lst(trs_inf0, 11)
     
     #delete col 'flag'
-    trs_inf1 = fpydelclm_frm_lsts_lst(trs_inf1, 10)
+    trs_inf1 = chghistory.fpydelclm_frm_lsts_lst(trs_inf1, 11)
         
     trs_inf01.append(trs_inf0[0])  #[[title]]
     trs_inf01.append(trs_inf0[1:]) #[[title], [[newrecords],..]]
@@ -1785,7 +1867,7 @@ def fpyselect_newrecords_s(driver, sheet, ncol, idno):
     #print('trs_inf01')
     #print(trs_inf01)
     
-    time.sleep(3)
+    #time.sleep(3)
     #nlbcs.fpydriver_quit(driver)
     
     return trs_inf01
@@ -1881,6 +1963,13 @@ fpynewtrs_inf_to_list_s:
     arguments 'wbN?, sheetN?' -> 'sheet?' worksheetobject version 
     v1.0
     2022/7/27
+    #* change parameter 11 to 12 because of an added column 'seaching date'
+    v1.01
+    2023/10/7
+    #** modified trs_inf0 and trs_inf1
+    v2.0
+    2023/10/13
+    
     @author: jicc
     
 """
@@ -1903,12 +1992,12 @@ def fpynewtrs_inf_to_list_s(sheet0, colidno0, sheet1, colidno1):
     Returns
     -------
     trs_inf01 : lists'list
-    [[newrecors'list], [overlappedrecords'list]]
+    [[newrecords'list], [overlappedrecords'list]]
     no title list
 
     """
     import nlbcs
-    #import chghistory
+    import chghistory
     import time
     from selenium.common.exceptions import NoSuchElementException
     
@@ -1922,15 +2011,21 @@ def fpynewtrs_inf_to_list_s(sheet0, colidno0, sheet1, colidno1):
     nlbcs.fpyname_click(driver, "method:goSearch") 
     for row_num1 in range(2, max_row1 + 1):
         
-        idno1 = fpygetCell_value(sheet1, row_num1, colidno1)
+        idno1 = chghistory.fpygetCell_value(sheet1, row_num1, colidno1)
         
         try:
-            tmp = fpyselect_newrecords_s(driver, sheet0, 11, idno1)
-            #trs_inf0.append(tmp[0]) #columns list
-            trs_inf0.append(tmp[1]) #new records list
-            #trs_inf1.append(tmp[0]) #columns list
-            trs_inf1.append(tmp[2]) #overlapped records list
-
+            tmp = fpyselect_newrecords_s(driver, sheet0, 12, idno1) #*
+            #**
+            #idno1の
+            #lists' list [[title], [[newrecord],..], [[overlapped record],..]]
+            ltmp1 = len(tmp[1]) #the number of elements in newrecords
+            for i in range(0,ltmp1):
+                trs_inf0.append(tmp[1][i]) #new records list
+                #[[newrecord], [newrecord], ...]
+            ltmp2 = len(tmp[2])
+            for j in range(0,ltmp2):
+                trs_inf1.append(tmp[2][j]) #overlapped records list
+                #[[overlapped record], [overlapped record], ...]         #``
         except NoSuchElementException:
              print("Error: " + idno1 + " not found")
                 
@@ -2029,15 +2124,15 @@ def fpynewtrs_infs_to_xlsx(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1):
     ----------
     wbN0 : str
         Excelfile name of originaldata
-        ex. "cowshistory.xlsx"
+        ex. "AB_cowshistory.xlsx"
     sheetN0 : str
         sheet name
-        ex. "MHFarm"
+        ex. "ABFarm"
     colidno0 : int
         column number of 'idno0' (sheetN0 )
     wbN1 : str
         Excelfile name of new idno information
-        ex. "??_cowslist.xlsx"
+        ex. "AB_cowslist.xlsx"
     sheetN1 : str
         sheet name
         ex. "cowslist"
@@ -2050,28 +2145,30 @@ def fpynewtrs_infs_to_xlsx(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1):
 
     """
 
-    #import chghistory
+    import chghistory
+    #import fmstls
     
-    wb0obj = fpyopenxl(wbN0, sheetN0)
+    wb0obj = chghistory.fpyopenxl(wbN0, sheetN0)
     wb0 = wb0obj[0]
     sheet0 = wb0obj[1]
     #max_row0 = sheet0.max_row
     
-    wb1obj = fpyopenxl(wbN1, sheetN1)
+    wb1obj = chghistory.fpyopenxl(wbN1, sheetN1)
     sheet1 = wb1obj[1]
     #max_row1 = sheet1.max_row
 
     trs_inf01 = \
         fpynewtrs_inf_to_list_s(sheet0, colidno0, sheet1, colidno1)
         
-    print('trs_inf01')
-    print(trs_inf01)
+    #print('trs_inf01')
+    #print(trs_inf01)
         
     trs_inf0 = trs_inf01[0] #newrecords
+        
     l0 = len(trs_inf0)
     if l0 > 0:
         for i in range(0, l0):
-            
+
             fpylisttoxls_s(trs_inf0[i], 2, sheet0)
             
         wb0.save(wbN0)
