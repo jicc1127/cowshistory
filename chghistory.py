@@ -1809,16 +1809,16 @@ def fpyselect_newrecords_s(driver, sheet, ncol, idno):
     [[title], [[newrecord],..], [[overlapped record],..]] 
 
     """
-    import chghistory
+    #import chghistory
     import nlbcs
     #import time
     import fmstls
     
     #excelfileのデータをlists'listにする
-    xllists = chghistory.fpyxllist_to_indlist_s(sheet, ncol, idno)
+    xllists = fpyxllist_to_indlist_s(sheet, ncol, idno)
     #print("xllists")
     #print(xllists)
-    xllists = chghistory.fpylstelemreplace_str(xllists, 10, '\u3000', ' ')
+    xllists = fpylstelemreplace_str(xllists, 10, '\u3000', ' ')
     #list 10(11番目)の"氏名または名称"の全角空白を半角空白に変換 
     #print('xllists')
     #print(xllists)    
@@ -1843,22 +1843,22 @@ def fpyselect_newrecords_s(driver, sheet, ncol, idno):
     trs_inf01 = [] #default
     #value"0"のカラムflagをすべてのリストに追加する
     #titleリストの最後にも0が追加されている
-    trs_inf_0 = chghistory.fpyaddclm_to_lsts_lst(trs_inf, 0)
+    trs_inf_0 = fpyaddclm_to_lsts_lst(trs_inf, 0)
     
     #xllistsにすでにあるlistのflagを0->1に変更する
     trs_inf_01 = fpyflag_dblrcd_1_(xllists, trs_inf_0)
     
     #list of new records　[[title], [newrecord], ...]
-    trs_inf0 = chghistory.fpydel_dblrcd(trs_inf_01, 11, 0)
+    trs_inf0 = fpydel_dblrcd(trs_inf_01, 11, 0)
     
     #list of overlapped records
-    trs_inf1 = chghistory.fpydel_dblrcd(trs_inf_01, 11, 1)
+    trs_inf1 = fpydel_dblrcd(trs_inf_01, 11, 1)
     
     #delete col 'flag'
-    trs_inf0 = chghistory.fpydelclm_frm_lsts_lst(trs_inf0, 11)
+    trs_inf0 = fpydelclm_frm_lsts_lst(trs_inf0, 11)
     
     #delete col 'flag'
-    trs_inf1 = chghistory.fpydelclm_frm_lsts_lst(trs_inf1, 11)
+    trs_inf1 = fpydelclm_frm_lsts_lst(trs_inf1, 11)
         
     trs_inf01.append(trs_inf0[0])  #[[title]]
     trs_inf01.append(trs_inf0[1:]) #[[title], [[newrecords],..]]
@@ -1997,7 +1997,7 @@ def fpynewtrs_inf_to_list_s(sheet0, colidno0, sheet1, colidno1):
 
     """
     import nlbcs
-    import chghistory
+    #import chghistory
     import time
     from selenium.common.exceptions import NoSuchElementException
     
@@ -2011,7 +2011,7 @@ def fpynewtrs_inf_to_list_s(sheet0, colidno0, sheet1, colidno1):
     nlbcs.fpyname_click(driver, "method:goSearch") 
     for row_num1 in range(2, max_row1 + 1):
         
-        idno1 = chghistory.fpygetCell_value(sheet1, row_num1, colidno1)
+        idno1 = fpygetCell_value(sheet1, row_num1, colidno1)
         
         try:
             tmp = fpyselect_newrecords_s(driver, sheet0, 12, idno1) #*
@@ -2145,15 +2145,15 @@ def fpynewtrs_infs_to_xlsx(wbN0, sheetN0, colidno0, wbN1, sheetN1, colidno1):
 
     """
 
-    import chghistory
+    #import chghistory
     #import fmstls
     
-    wb0obj = chghistory.fpyopenxl(wbN0, sheetN0)
+    wb0obj = fpyopenxl(wbN0, sheetN0)
     wb0 = wb0obj[0]
     sheet0 = wb0obj[1]
     #max_row0 = sheet0.max_row
     
-    wb1obj = chghistory.fpyopenxl(wbN1, sheetN1)
+    wb1obj = fpyopenxl(wbN1, sheetN1)
     sheet1 = wb1obj[1]
     #max_row1 = sheet1.max_row
 
