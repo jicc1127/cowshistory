@@ -2331,7 +2331,140 @@ def fpyelems_lstfrmxls_lst_s(sheet, coln):
             
         
     return elements        
-           
+ 
+#fpyext_frmlsts_lst########################################################
+"""
+fpyext_frmlsts_lst:
+    extract specific name's lists from lists' list
+    ｖ1.00
+    2023/10/16
+    @author: jicc
+    
+"""
+def fpyext_frmlsts_lst(lst, index, name):
+    """
+    extract specific name's lists from lists' list
+
+    Parameters
+    ----------
+    lst : list
+        individual transfer information 
+    index : int
+        index number of an element : Farm name
+    name : str
+        Farm name
+
+    Returns
+    -------
+    list
+    extracted list
+
+    """
+    llst = len(lst)
+    lst_ = []
+    for i in range(0,llst):
+        
+        if lst[i][index] == name:
+            lst_.append(lst[i])
+        else:
+            continue
+    
+    return lst_
+
+#fpyterms_in_farm############################################################
+"""
+fpyterms_in_farm:
+    get a list 'term in farm'
+    個体の牧場所属期間( a term in a farm)のリストを得る
+    注) 異動情報に転出がなく、直接搬入など他所へ異動になっている場合の処理がない
+    v1.0
+    2023/12/9
+    by jicc
+    
+"""
+def fpyterms_in_farm( wbN, sheetN, ncol, idno, name ):
+    """
+    get a list 'term in farm'
+
+    Parameters
+    ----------
+    wbN : str
+        Excelfile's name : AB_cowshistory.xlsx
+    sheetN : str
+        sheet name : ABFarm
+    ncol : int
+        number of columns 列数 : 12
+    idno : str
+        idNo 個体識別番号 : "0123456789"
+    name : str
+        氏名または名称　
+
+    Returns
+    -------
+    terms_in_farm : list
+        lists' list :[['出生'or'転入'の年月日, '転出','死亡'の年月日 or None],..] 
+
+    """
+    #from jiccModule import chghistory
+    import chghistory
+    #import openpyxl
+    
+    wbobj = chghistory.fpyopenxl(wbN, sheetN)   #get Worksheet object
+    #wb = wbobj[0]
+    sheet = wbobj[1]
+    
+    xllists = fpyxllist_to_indlist_s(sheet, ncol, idno)
+    #個体識別番号 idNo の異動情報のリスト
+    print("xllists")
+    print(xllists)
+    #lxllists = len(xllists)
+       
+    xllists_ = fpyext_frmlsts_lst(xllists, 10, name)
+    #index 10 : "氏名または名称"
+    #当該牧場の異動情報だけ抽出
+
+    xllists_.sort(key = lambda x:x[8]) #, reverse=True
+    #lists' listを 異動年月日 昇順 でsort lambda関数を利用
+    
+    print("xllists_")
+    print(xllists_)
+    
+    term_in_farm = []   #term_in_farm default
+    #['出生'or'転入'の年月日, '転出'or'死亡'の年月日]　個体の牧場　1所属期間
+    terms_in_farm = []  #terms_in_farm default
+    #　個体の牧場所属期間のすべてのリスト
+    
+    lxllists_ = len(xllists_)
+    
+    l_2 = lxllists_ // 2        #a divisor of lxllists_ by 2
+    l_2_res = lxllists_ % 2
+    
+    for i in range(0, l_2):
+            term_in_farm.append(xllists_[i*2][8])   #出生, 転入 年月日
+            term_in_farm.append(xllists_[i*2+1][8]) #死亡, 転出 年月日
+            #print("term_in_farm")
+            #print(term_in_farm)
+            terms_in_farm.append(term_in_farm) 
+            #add a list [転入, 転出] (所属期間) 
+            term_in_farm = []   #term_in_farm default
+        
+       
+    if l_2_res == 1:
+        
+        term_in_farm.append(xllists_[i*2+2][8])
+        term_in_farm.append(None)
+        #print("term_in_farm")
+        #print(term_in_farm)
+        
+        terms_in_farm.append(term_in_farm)
+
+    print(idno)        
+    print("terms_in_farm")
+    print(terms_in_farm)
+    
+    return terms_in_farm
+
+          
 #fpychghistoryReference###################################################################
 """
 fpychghistoryReference:         reference of chghistory's functions
@@ -2471,7 +2604,16 @@ def fpychghistoryReference():
     print('**fpyelems_lstfrmxls_lst(wbN, sheetN, coln)')
     print('  fpyelems_lstfrmxls_lst_s(sheet, coln)')
     print('make an elements\' list from Excel\'s list')
-    print('--------------------------------------------------------------------2023/10/1　by jicc---------')
+    print('....................................................................................')
+    print('**fpyext_frmlsts_lst(lst, index, name)')
+    print('extract specific name\'s lists from lists\' list')
+    print('個体異動情報リストの、特定農場だけの異動情報を抽出する')
+    print('....................................................................................')
+    print('**fpyterms_in_farm( wbN, sheetN, ncol, idno, name )')
+    print('get a list \'term in farm\'')
+    print('個体の牧場所属期間( a term in a farm)のリストを得る')
+    print('注) 異動情報に転出がなく、直接搬入など他所へ異動になっている場合の処理がない')
+    print('----------------------------------------------------------2023/12/9　by jicc---------')
     
     
 """
