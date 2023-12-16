@@ -2371,6 +2371,77 @@ def fpyext_frmlsts_lst(lst, index, name):
     
     return lst_
 
+#fpyarr_frmlsts_lst###########################################################
+"""
+fpyarr_frmlsts_lst : arrange an individual and specific name's lists 
+    個体の特定農場の異動情報を調整する
+    最後の転出情報がかけていた場合の調整
+    ex."転入" -> "搬入"の場合 : "搬入" -> "転出" とし、"住所", "氏名または名称"も変更し、
+    xllixts_ の最後に追加する。
+    注)xllists_ の中で、"転入" -> "転入" となって"転出"が欠けているいる場合は想定していない。
+    
+    ｖ1.0
+    2023/12/16
+    @author: jicc
+"""
+def fpyarr_frmlsts_lst( xllists, xllists_):
+    """
+    arrange an individual and specific name's lists 
+
+    Parameters
+    ----------
+    xllists : list
+        a list of an individual transfer information
+    xlsists_ : list
+        a list of an individual and specific name's lists 
+     
+    Returns
+    -------
+    xllists_ : list
+
+    """
+    lxllists = len(xllists)
+    print("lxllists")
+    print(lxllists)
+
+    lxllists_ = len(xllists_)
+    print("lxllists_")
+    print(lxllists_)
+
+    reason_to_transfer = xllists_[lxllists_-1][7] 
+    #xllists_　最後の要素の"異動内容"
+    print("reason_to_transfer")
+    print(reason_to_transfer)
+ 
+    if reason_to_transfer == "出生" or "転入":
+    
+        xllists__No = xllists_[lxllists_-1][6]
+        #xllists_　最後の要素の"No"
+        ixllists__No = int(xllists__No)
+        if ixllists__No < lxllists: 
+            #xllists_の最後の要素のあとに、xllsitsの要素がある場合
+            # "転出"が記載されていなくて、他所に"搬入", "転入"など異動している。
+        
+            tmp = xllists[ixllists__No]
+            #xllistsで、xllists_最後の要素の次の要素
+            print('tmp')
+            print(tmp)
+            tmp[7] = "転出"  #"転出"に変更
+            tmp[9] = xllists_[lxllists_-1][9]   #"住所"を変更
+            tmp[10] = xllists_[lxllists_-1][10] #"氏名または名称"を変更
+            print('tmp')
+            print(tmp)
+        
+            xllists_.append(tmp) #tmpをxllists_に追加して、転出した状態にする。
+        
+        #else:
+        
+    #else:
+    return xllists_
+    
+    #print("xllists_")
+    #print(xllists_)
+
 #fpyterms_in_farm############################################################
 """
 fpyterms_in_farm:
@@ -2379,6 +2450,11 @@ fpyterms_in_farm:
     注) 異動情報に転出がなく、直接搬入など他所へ異動になっている場合の処理がない
     v1.0
     2023/12/9
+    *)最後の転出情報がかけていた場合の調整
+    ex."転入" -> "搬入"の場合 : "搬入" -> "転出" とし、"住所", "氏名または名称"も変更し、
+    xllixts_ の最後に追加する。
+    v1.1
+    2023/12/16
     by jicc
     
 """
@@ -2406,10 +2482,10 @@ def fpyterms_in_farm( wbN, sheetN, ncol, idno, name ):
 
     """
     #from jiccModule import chghistory
-    import chghistory
+    #import chghistory
     #import openpyxl
     
-    wbobj = chghistory.fpyopenxl(wbN, sheetN)   #get Worksheet object
+    wbobj = fpyopenxl(wbN, sheetN)   #get Worksheet object
     #wb = wbobj[0]
     sheet = wbobj[1]
     
@@ -2418,6 +2494,8 @@ def fpyterms_in_farm( wbN, sheetN, ncol, idno, name ):
     print("xllists")
     print(xllists)
     #lxllists = len(xllists)
+    xllists.sort(key = lambda x:x[8]) #, reverse=True
+    #lists' listを 異動年月日 昇順 でsort lambda関数を利用
        
     xllists_ = fpyext_frmlsts_lst(xllists, 10, name)
     #index 10 : "氏名または名称"
@@ -2428,6 +2506,9 @@ def fpyterms_in_farm( wbN, sheetN, ncol, idno, name ):
     
     print("xllists_")
     print(xllists_)
+    
+    xllists_ = fpyarr_frmlsts_lst( xllists, xllists_)   # *)
+    #最後の"転出"が欠けていた場合の調整
     
     term_in_farm = []   #term_in_farm default
     #['出生'or'転入'の年月日, '転出'or'死亡'の年月日]　個体の牧場　1所属期間
@@ -2609,11 +2690,15 @@ def fpychghistoryReference():
     print('extract specific name\'s lists from lists\' list')
     print('個体異動情報リストの、特定農場だけの異動情報を抽出する')
     print('....................................................................................')
+    print('**fpyarr_frmlsts_lst( xllists, xllists_)')
+    print('arrange an individual and specific name\'s lists ')
+    print('個体の特定農場の異動情報を調整する,最後の転出情報がかけていた場合の調整')
+    print('....................................................................................')
     print('**fpyterms_in_farm( wbN, sheetN, ncol, idno, name )')
     print('get a list \'term in farm\'')
     print('個体の牧場所属期間( a term in a farm)のリストを得る')
     print('注) 異動情報に転出がなく、直接搬入など他所へ異動になっている場合の処理がない')
-    print('----------------------------------------------------------2023/12/9　by jicc---------')
+    print('----------------------------------------------------------2023/12/16　by jicc---------')
     
     
 """
