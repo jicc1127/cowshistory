@@ -2453,6 +2453,7 @@ fpyterms_in_farm:
     *)最後の転出情報がかけていた場合の調整
     ex."転入" -> "搬入"の場合 : "搬入" -> "転出" とし、"住所", "氏名または名称"も変更し、
     xllixts_ の最後に追加する。
+    注)xllists_ の中で、"転入" -> "転入" となって"転出"が欠けているいる場合は想定していない。
     v1.1
     2023/12/16
     by jicc
@@ -2544,6 +2545,53 @@ def fpyterms_in_farm( wbN, sheetN, ncol, idno, name ):
     print(terms_in_farm)
     
     return terms_in_farm
+
+#fpybelong_or_not############################################################
+"""
+fpybelong_or_not : check a base date belongs to a period or not
+    this function needs to import datetime
+    v1.0
+    20232/12/17
+    @author: jicc
+    
+"""
+def fpybelong_or_not( bdate, term ):
+    '''
+    check a base date belongs to a period or not
+
+    Parameters
+    ----------
+    bdate : datetime.datetimeTYPE
+        base date
+    term : list
+        a belinging period:[in(datetime.datetime), out(datetime.datetime)] 
+
+    Returns
+    -------
+    int belong_or_not : belong ==1, not == 0
+
+    '''
+    belong_or_not = None        #dfault
+    
+    if term[1] == None:
+        if bdate >= term[0]:
+            belong_or_not = 1
+        elif bdate < term[0]:
+            belong_or_not = 0
+    
+    else: 
+    
+        if bdate >= term[0] and bdate < term[1]:
+        
+            belong_or_not = 1
+    
+        elif bdate < term[0] or bdate >= term[1]:
+        
+            belong_or_not = 0
+        
+    
+    return belong_or_not
+
 
           
 #fpychghistoryReference###################################################################
@@ -2698,7 +2746,11 @@ def fpychghistoryReference():
     print('get a list \'term in farm\'')
     print('個体の牧場所属期間( a term in a farm)のリストを得る')
     print('注) 異動情報に転出がなく、直接搬入など他所へ異動になっている場合の処理がない')
-    print('----------------------------------------------------------2023/12/16　by jicc---------')
+    print('....................................................................................')
+    print('**fpybelong_or_not( bdate, term )')
+    print('check a base date belongs to a period or not')
+    print('基準日(bdate)に個体がその所属期間に属しているかどうか')
+    print('----------------------------------------------------------2023/12/17　by jicc---------')
     
     
 """
