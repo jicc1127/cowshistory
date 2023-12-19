@@ -2564,7 +2564,7 @@ def fpybelong_or_not( bdate, term ):
     bdate : datetime.datetimeTYPE
         base date
     term : list
-        a belinging period:[in(datetime.datetime), out(datetime.datetime)] 
+        a belonging period:[in(datetime.datetime), out(datetime.datetime)] 
 
     Returns
     -------
@@ -2589,6 +2589,46 @@ def fpybelong_or_not( bdate, term ):
         
             belong_or_not = 0
         
+    
+    return belong_or_not
+
+#fpyind_belongornot#########################################################
+"""
+fpyind_belongornot : 
+    an individual belongs to a farm or not at a base date
+    this function needs to import datetime
+    v1.0
+    2023/12/19
+    @author: jicc
+    
+"""
+def fpyind_belongornot(bdate, terms):
+    """
+    
+    an individual belongs to a farm or not at a base date
+
+    Parameters
+    ----------
+    bdate : datetime.datetime
+        base date
+    terms : lists' list'
+        belonging periods:
+            [[in(datetime.datetime), out(datetime.datetime)] , [...], ]
+
+    Returns
+    -------
+    int belong_or_not : belong ==1, not == 0
+
+    """
+    lterms = len(terms)
+    for i in range(0, lterms):
+        bn = fpybelong_or_not(bdate, terms[i])
+        if bn == 1:
+            break
+        elif bn == 0:
+            continue
+        
+    belong_or_not = bn
     
     return belong_or_not
 
@@ -2750,7 +2790,11 @@ def fpychghistoryReference():
     print('**fpybelong_or_not( bdate, term )')
     print('check a base date belongs to a period or not')
     print('基準日(bdate)に個体がその所属期間に属しているかどうか')
-    print('----------------------------------------------------------2023/12/17　by jicc---------')
+    print('....................................................................................')
+    print('**fpyind_belongornot( bdate, terms )')
+    print('an individual belongs to a farm or not at a base date')
+    print('基準日(bdate)に個体がその農場に属しているかどうか')
+    print('----------------------------------------------------------2023/12/19　by jicc---------')
     
     
 """
