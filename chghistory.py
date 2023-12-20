@@ -2546,6 +2546,67 @@ def fpyterms_in_farm( wbN, sheetN, ncol, idno, name ):
     
     return terms_in_farm
 
+#fpyterms_in_farm_############################################################
+"""
+fpyterms_in_farm_:
+    get a list 'term in farm'
+    list only version
+    v1.0
+    2023/12/19
+    by jicc
+    
+"""
+def fpyterms_in_farm_( xllists_ ):
+    """
+    get a list 'term in farm'
+
+    Parameters
+    ----------
+    xlsists_ : list
+        a list of an individual and specific name's lists 
+
+    Returns
+    -------
+    terms_in_farm : list
+        lists' list :[['出生'or'転入'の年月日, '転出','死亡'の年月日 or None],..] 
+
+    """
+ 
+    term_in_farm = []   #term_in_farm default
+    #['出生'or'転入'の年月日, '転出'or'死亡'の年月日]　個体の牧場　1所属期間
+    terms_in_farm = []  #terms_in_farm default
+    #　個体の牧場所属期間のすべてのリスト
+    
+    lxllists_ = len(xllists_)
+    
+    l_2 = lxllists_ // 2        #a divisor of lxllists_ by 2
+    l_2_res = lxllists_ % 2
+    
+    for i in range(0, l_2):
+            term_in_farm.append(xllists_[i*2][8])   #出生, 転入 年月日
+            term_in_farm.append(xllists_[i*2+1][8]) #死亡, 転出 年月日
+            #print("term_in_farm")
+            #print(term_in_farm)
+            terms_in_farm.append(term_in_farm) 
+            #add a list [転入, 転出] (所属期間) 
+            term_in_farm = []   #term_in_farm default
+        
+       
+    if l_2_res == 1:
+        
+        term_in_farm.append(xllists_[i*2+2][8])
+        term_in_farm.append(None)
+        #print("term_in_farm")
+        #print(term_in_farm)
+        
+        terms_in_farm.append(term_in_farm)
+
+    #print(idno)        
+    print("terms_in_farm")
+    print(terms_in_farm)
+    
+    return terms_in_farm
+
 #fpybelong_or_not############################################################
 """
 fpybelong_or_not : check a base date belongs to a period or not
@@ -2787,6 +2848,10 @@ def fpychghistoryReference():
     print('個体の牧場所属期間( a term in a farm)のリストを得る')
     print('注) 異動情報に転出がなく、直接搬入など他所へ異動になっている場合の処理がない')
     print('....................................................................................')
+    print('**fpyterms_in_farm_( xllists_ )')
+    print('get a list \'term in farm\'')
+    print('parameter is one list(xllists_) only version')
+    print('....................................................................................')
     print('**fpybelong_or_not( bdate, term )')
     print('check a base date belongs to a period or not')
     print('基準日(bdate)に個体がその所属期間に属しているかどうか')
@@ -2794,7 +2859,7 @@ def fpychghistoryReference():
     print('**fpyind_belongornot( bdate, terms )')
     print('an individual belongs to a farm or not at a base date')
     print('基準日(bdate)に個体がその農場に属しているかどうか')
-    print('----------------------------------------------------------2023/12/19　by jicc---------')
+    print('----------------------------------------------------------2023/12/20　by jicc---------')
     
     
 """
