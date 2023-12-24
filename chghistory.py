@@ -2379,10 +2379,15 @@ fpyarr_frmlsts_lst : arrange an individual and specific name's lists
     ex."転入" -> "搬入"の場合 : "搬入" -> "転出" とし、"住所", "氏名または名称"も変更し、
     xllixts_ の最後に追加する。
     注)xllists_ の中で、"転入" -> "転入" となって"転出"が欠けているいる場合は想定していない。
-    
     ｖ1.0
     2023/12/16
+    1) reason_to_transfer == "出生"　or "転入" ->
+        reason_to_transfer == "出生" or reason_to_transfer == "転入"　に訂正
+    2) ixllists__No < lxllists ->  ixllists_No < ixllistsNo に変更
+    v1.01
+    2023/12/24
     @author: jicc
+    
 """
 def fpyarr_frmlsts_lst( xllists, xllists_):
     """
@@ -2413,16 +2418,21 @@ def fpyarr_frmlsts_lst( xllists, xllists_):
     print("reason_to_transfer")
     print(reason_to_transfer)
  
-    if reason_to_transfer == "出生" or "転入":
-    
-        xllists__No = xllists_[lxllists_-1][6]
+    if reason_to_transfer == "出生" or reason_to_transfer == "転入": # 1)
+        
+        xllistsNo = xllists[lxllists-1][6] # 2)
+        #xllists　最後の要素の"No"
+        ixllistsNo = int(xllistsNo) # 2*)
+        
+        xllists_No = xllists_[lxllists_-1][6]
         #xllists_　最後の要素の"No"
-        ixllists__No = int(xllists__No)
-        if ixllists__No < lxllists: 
+        ixllists_No = int(xllists_No)
+        
+        if ixllists_No < ixllistsNo: # 2)
             #xllists_の最後の要素のあとに、xllsitsの要素がある場合
             # "転出"が記載されていなくて、他所に"搬入", "転入"など異動している。
         
-            tmp = xllists[ixllists__No]
+            tmp = xllists[ixllists_No]
             #xllistsで、xllists_最後の要素の次の要素
             print('tmp')
             print(tmp)
@@ -2433,14 +2443,11 @@ def fpyarr_frmlsts_lst( xllists, xllists_):
             print(tmp)
         
             xllists_.append(tmp) #tmpをxllists_に追加して、転出した状態にする。
-        
-        #else:
-        
-    #else:
-    return xllists_
     
-    #print("xllists_")
-    #print(xllists_)
+    print("arranged xllists_")
+    print(xllists_)
+
+    return xllists_
 
 #fpyterms_in_farm############################################################
 """
