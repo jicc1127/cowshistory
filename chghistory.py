@@ -2389,6 +2389,7 @@ fpyarr_frmlsts_lst : arrange an individual and specific name's lists
     @author: jicc
     
 """
+
 def fpyarr_frmlsts_lst( xllists, xllists_):
     """
     arrange an individual and specific name's lists 
@@ -2460,9 +2461,11 @@ fpyterms_in_farm:
     *)最後の転出情報がかけていた場合の調整
     ex."転入" -> "搬入"の場合 : "搬入" -> "転出" とし、"住所", "氏名または名称"も変更し、
     xllixts_ の最後に追加する。
-    注)xllists_ の中で、"転入" -> "転入" となって"転出"が欠けているいる場合は想定していない。
     v1.1
     2023/12/16
+    動き不十分のため、#**) 以下を全面書き換え
+    v2.0
+    2023/12/29
     by jicc
     
 """
@@ -2490,10 +2493,10 @@ def fpyterms_in_farm( wbN, sheetN, ncol, idno, name ):
 
     """
     #from jiccModule import chghistory
-    #import chghistory
+    import chghistory
     #import openpyxl
     
-    wbobj = fpyopenxl(wbN, sheetN)   #get Worksheet object
+    wbobj = chghistory.fpyopenxl(wbN, sheetN)   #get Worksheet object
     #wb = wbobj[0]
     sheet = wbobj[1]
     
@@ -2515,42 +2518,79 @@ def fpyterms_in_farm( wbN, sheetN, ncol, idno, name ):
     print("xllists_")
     print(xllists_)
     
-    xllists_ = fpyarr_frmlsts_lst( xllists, xllists_)   # *)
+    xllists_ = chghistory.fpyarr_frmlsts_lst( xllists, xllists_)   # *)
     #最後の"転出"が欠けていた場合の調整
+    print("arrxllists_")
+    print(xllists_)
     
-    term_in_farm = []   #term_in_farm default
+    #term_in_farm = []   #term_in_farm default
     #['出生'or'転入'の年月日, '転出'or'死亡'の年月日]　個体の牧場　1所属期間
-    terms_in_farm = []  #terms_in_farm default
+    #terms_in_farm = []  #terms_in_farm default
     #　個体の牧場所属期間のすべてのリスト
     
-    lxllists_ = len(xllists_)
+    #**) v2.0
+    lxllists_ = len(xllists_) #異動情報の要素数 
     
-    l_2 = lxllists_ // 2        #a divisor of lxllists_ by 2
-    l_2_res = lxllists_ % 2
+    #l_2 = lxllists_ // 2        #a divisor of lxllists_ by 2
+    l_2_res = lxllists_ % 2     # a residural of lxllists_ by 2
     
-    for i in range(0, l_2):
-            term_in_farm.append(xllists_[i*2][8])   #出生, 転入 年月日
-            term_in_farm.append(xllists_[i*2+1][8]) #死亡, 転出 年月日
-            #print("term_in_farm")
-            #print(term_in_farm)
-            terms_in_farm.append(term_in_farm) 
-            #add a list [転入, 転出] (所属期間) 
-            term_in_farm = []   #term_in_farm default
-        
-       
-    if l_2_res == 1:
-        
-        term_in_farm.append(xllists_[i*2+2][8])
-        term_in_farm.append(None)
-        #print("term_in_farm")
-        #print(term_in_farm)
-        
-        terms_in_farm.append(term_in_farm)
-
-    print(idno)        
-    print("terms_in_farm")
-    print(terms_in_farm)
+    tmp = [] #異動年月日 昇順のリスト default
+    terms_in_farm = []  #terms_in_farm default
+    #　個体の牧場所属期間のすべてのリスト lists' list
     
+    if l_2_res == 0: #異動情報の要素数が偶数 : 転出済の個体
+        
+        #異動年月日 昇順 のリスト tmp を作成
+        for i in range(1,lxllists_+1):
+            tmp.append(xllists_[0][8])
+            del xllists_[0]
+            
+        #所属期間 ['出生'or'転入'の年月日, '転出'or'死亡'の年月日]
+        #のリスト terms_in_farm(lists' list)を作成
+        ltmp = len(tmp)
+        lterms_in_farm = ltmp // 2
+        for j in range(1,lterms_in_farm+1):
+            terms_in_farm.append(tmp[0:2])  #term_in_farm
+            del tmp[0:2]
+        print('tmp')
+        print(tmp)
+        #print(idno)        
+        print("terms_in_farm")
+        print(terms_in_farm)
+        
+    elif l_2_res == 1:  #異動情報の要素数が奇数 : 所属している個体(転出していない)
+    
+        #異動年月日 昇順 のリスト tmp を作成
+        for i in range(1,lxllists_+1):
+            tmp.append(xllists_[0][8])
+            del xllists_[0]
+        
+        #最後の転入以前の
+        #所属期間 ['出生'or'転入'の年月日, '転出'or'死亡'の年月日]
+        #のリスト terms_in_farm(lists' list)を作成
+        ltmp = len(tmp)
+        lterms_in_farm = ltmp // 2
+        for j in range(1,lterms_in_farm+1):
+            terms_in_farm.append(tmp[0:2])  #term_in_farm
+            del tmp[0:2]
+        
+        print('tmp')
+        print(tmp)
+        print('terms_in_farm')
+        print(terms_in_farm)
+        
+        #最後の転入(出生)の年月日だけ残っているtmpに、
+        #None(転出していない) を加える        
+        tmp.append(None)
+        #最後の所属期間 ['出生'or'転入'の年月日, None] を加える。
+        terms_in_farm.append(tmp[0:2])
+        del tmp[0:2]
+        print('tmp')
+        print(tmp)
+        #print(idno)        
+        print("terms_in_farm")
+        print(terms_in_farm)
+ 
     return terms_in_farm
 
 #fpyterms_in_farm_############################################################
@@ -2560,6 +2600,9 @@ fpyterms_in_farm_:
     list only version
     v1.0
     2023/12/19
+    動き不十分のため、全面書き換え
+    v2.0
+    2023/12/29
     by jicc
     
 """
@@ -2570,48 +2613,83 @@ def fpyterms_in_farm_( xllists_ ):
     Parameters
     ----------
     xlsists_ : list
-        a list of an individual and specific name's lists 
-
+        an individual transfer informations' list at a specific farm 
+        個体の特定の農場での異動情報のリスト
+        注) リストは、異動年月日昇順であることが必要 必要なら　#*)を使用する
     Returns
     -------
     terms_in_farm : list
         lists' list :[['出生'or'転入'の年月日, '転出','死亡'の年月日 or None],..] 
 
     """
- 
-    term_in_farm = []   #term_in_farm default
+    #term_in_farm = [] default
     #['出生'or'転入'の年月日, '転出'or'死亡'の年月日]　個体の牧場　1所属期間
+    
+    #xllists_.sort(key = lambda x:x[8]) #, reverse=True  #*)
+    #lists' listを 異動年月日 昇順 でsort lambda関数を利用
+    
+    lxllists_ = len(xllists_) #異動情報の要素数
+    
+    #l_2 = lxllists_ // 2        #a divisor of lxllists_ by 2
+    l_2_res = lxllists_ % 2     # a residural of lxllists_ by 2
+    
+    tmp = [] #異動年月日 昇順のリスト default
     terms_in_farm = []  #terms_in_farm default
-    #　個体の牧場所属期間のすべてのリスト
+    #　個体の牧場所属期間のすべてのリスト lists' list
     
-    lxllists_ = len(xllists_)
-    
-    l_2 = lxllists_ // 2        #a divisor of lxllists_ by 2
-    l_2_res = lxllists_ % 2
-    
-    for i in range(0, l_2):
-            term_in_farm.append(xllists_[i*2][8])   #出生, 転入 年月日
-            term_in_farm.append(xllists_[i*2+1][8]) #死亡, 転出 年月日
-            #print("term_in_farm")
-            #print(term_in_farm)
-            terms_in_farm.append(term_in_farm) 
-            #add a list [転入, 転出] (所属期間) 
-            term_in_farm = []   #term_in_farm default
+    if l_2_res == 0: #異動情報の要素数が偶数 : 転出済の個体
         
-       
-    if l_2_res == 1:
+        #異動年月日 昇順 のリスト tmp を作成
+        for i in range(1,lxllists_+1):
+            tmp.append(xllists_[0][8])
+            del xllists_[0]
+            
+        #所属期間 ['出生'or'転入'の年月日, '転出'or'死亡'の年月日]
+        #のリスト terms_in_farm(lists' list)を作成
+        ltmp = len(tmp)
+        lterms_in_farm = ltmp // 2
+        for j in range(1,lterms_in_farm+1):
+            terms_in_farm.append(tmp[0:2])  #term_in_farm
+            del tmp[0:2]
+        print('tmp')
+        print(tmp)
+        #print(idno)        
+        print("terms_in_farm")
+        print(terms_in_farm)
         
-        term_in_farm.append(xllists_[i*2+2][8])
-        term_in_farm.append(None)
-        #print("term_in_farm")
-        #print(term_in_farm)
-        
-        terms_in_farm.append(term_in_farm)
-
-    #print(idno)        
-    print("terms_in_farm")
-    print(terms_in_farm)
+    elif l_2_res == 1:  #異動情報の要素数が奇数 : 所属している個体(転出していない)
     
+        #異動年月日 昇順 のリスト tmp を作成
+        for i in range(1,lxllists_+1):
+            tmp.append(xllists_[0][8])
+            del xllists_[0]
+        
+        #最後の転入以前の
+        #所属期間 ['出生'or'転入'の年月日, '転出'or'死亡'の年月日]
+        #のリスト terms_in_farm(lists' list)を作成
+        ltmp = len(tmp)
+        lterms_in_farm = ltmp // 2
+        for j in range(1,lterms_in_farm+1):
+            terms_in_farm.append(tmp[0:2])  #term_in_farm
+            del tmp[0:2]
+        
+        print('tmp')
+        print(tmp)
+        print('terms_in_farm')
+        print(terms_in_farm)
+        
+        #最後の転入(出生)の年月日だけ残っているtmpに、
+        #None(転出していない) を加える        
+        tmp.append(None)
+        #最後の所属期間 ['出生'or'転入'の年月日, None] を加える。
+        terms_in_farm.append(tmp[0:2])
+        del tmp[0:2]
+        print('tmp')
+        print(tmp)
+        #print(idno)        
+        print("terms_in_farm")
+        print(terms_in_farm)
+ 
     return terms_in_farm
 
 #fpybelong_or_not############################################################
