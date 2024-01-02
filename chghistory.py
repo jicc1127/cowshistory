@@ -2597,7 +2597,7 @@ def fpyterms_in_farm( wbN, sheetN, ncol, idno, name ):
 """
 fpyterms_in_farm_:
     get a list 'term in farm'
-    list only version
+    a parameter is a list only
     v1.0
     2023/12/19
     動き不十分のため、全面書き換え
@@ -2707,7 +2707,7 @@ def fpybelong_or_not( bdate, term ):
 
     Parameters
     ----------
-    bdate : datetime.datetimeTYPE
+    bdate : datetime.datetime
         base date
     term : list
         a belonging period:[in(datetime.datetime), out(datetime.datetime)] 
@@ -2774,22 +2774,140 @@ def fpyind_belongornot(bdate, terms):
         elif bn == 0:
             continue
         
-    belong_or_not = bn
+    belongornot = bn
     
-    return belong_or_not
+    return belongornot
 
+#fpysep_outfrmin#############################################################
+"""
+fpysep_outfrmin
+    separate move-out cows from move-in 
+    異動情報のExcelfile: AB_cowshistory.xlsx の　sheet　ABFarmの情報を
+    基準日における所属牛（転入牛move-in)と転出牛(move-out)の情報に分け、
+    2枚のsheet ABFarmin, ABFarmout を作成する
+    注) 使用前に２枚のsheet sheetN+'in'と sheetN+'out'を作成しておくこと
+        chghistory.fpymkxlsheet(wbN, sheetN, scolN, r)
+    v1.0
+    2024/1/2
+    @author: jicc
+    
+"""
+def fpysep_outfrmin( wbN, sheetN, coln, ncol, index, name, bdate ):
+    """
+    separate move-out cows from move-in 
 
+    Parameters
+    ----------
+    wbN : str
+        Excelfile to check move-in or move-out data  
+        'AB_cowshistory.xlsx'　対象のエクセルファイル名
+    sheetN : str
+        sheet name to separate move-out cows from move-in
+        'ABFarm'　対象のエクセルシート名
+    coln : int
+        column's number of idNo 個体識別番号の入っている列番号
+    ncol : int
+        number of columns sheet ABFarm のリストの列数
+    index : int
+        index number of an element(Farm name)　
+        リスト上の　'氏名または名称'のindex番号
+    name : str
+        Farm name '氏名または名称'
+    bdate : str
+        base date 基準日
+
+    Returns
+    -------
+    None.
+
+    """
+
+    import openpyxl
+    import chghistory
+    import datetime
+
+    wb = openpyxl.load_workbook(wbN)
+    sheet = wb[sheetN]
+    sheetin = wb[sheetN + 'in']
+    sheetout = wb[sheetN + 'out']
+    
+    idNos = chghistory.fpyelems_lstfrmxls_lst_s(sheet, coln)
+    print('idNos')
+    print(idNos)
+
+    lidNos = len(idNos)
+
+    for i in range(0,lidNos):
+        
+        xllists = chghistory.fpyxllist_to_indlist_s(sheet, ncol, idNos[i])
+        #個体識別番号 idNo の異動情報のリスト
+        print("xllists")
+        print(xllists)
+        #lxllists = len(xllists)
+        xllists.sort(key = lambda x:x[8]) #, reverse=True
+        #lists' listを 異動年月日 昇順 でsort lambda関数を利用
+           
+        xllists_ = chghistory.fpyext_frmlsts_lst(xllists, index, name)
+        #index 10 : "氏名または名称"
+        #当該牧場の異動情報だけ抽出
+
+        xllists_.sort(key = lambda x:x[8]) #, reverse=True
+        #lists' listを 異動年月日 昇順 でsort lambda関数を利用
+        
+        print("xllists_")
+        print(xllists_)
+        
+        xllists_ = chghistory.fpyarr_frmlsts_lst( xllists, xllists_ )   # *)
+        #最後の"転出"が欠けていた場合の調整
+        print("xllists_")
+        print(xllists_)
+        
+        xllists_org = []
+        
+        lxllists_ = len(xllists_)
+        for j in range(0,lxllists_):
+            xllists_org.append(xllists_[j])
+        
+        lxllists_org = len(xllists_org)
+            
+
+        terms_in_farm = chghistory.fpyterms_in_farm_( xllists_ )
+        print("terms_in_farm")
+        print(terms_in_farm)
+        
+        #bdate = '2023/12/31'
+        print(bdate)
+        if type(bdate) == str: 
+            bdate = datetime.datetime.strptime(bdate, '%Y/%m/%d')
+        print('bdate')
+        print(bdate)
+        
+        belongornot = chghistory.fpyind_belongornot( bdate, terms_in_farm )
+        print('belongornot')
+        print(belongornot)
+        
+        if belongornot == 0:
+            for k in range(0, lxllists_org):
+                chghistory.fpylisttoxls_s(xllists_org[k], 1, sheetout)
+                #wb.save('..\CD_cowshistory.xlsx')
+        
+        elif belongornot == 1:
+            for k in range(0, lxllists_org):
+                chghistory.fpylisttoxls_s(xllists_org[k], 1, sheetin)
+                #wb.save('..\CD_cowshistory.xlsx')
+                
+    wb.save(wbN)
           
 #fpychghistoryReference###################################################################
 """
 fpychghistoryReference:         reference of chghistory's functions
-ｖ1.1
-2022/4/2
+ｖ2.0
+2024/1/2
 @author: jicc
 """
 def fpychghistoryReference():
     
-    print('-----chghistoryReference ---------------------------------------------------------v1.05------')
+    print('-----chghistoryReference ---------------------------------------------------------v2.00------')
     print('**fpyopenxl(wbN, sheetN)')
     print('Excelfile wbN.xlsx　sheet sheetN Open ')
     print('.............................................................................................')
@@ -2935,6 +3053,11 @@ def fpychghistoryReference():
     print('....................................................................................')
     print('**fpyterms_in_farm_( xllists_ )')
     print('get a list \'term in farm\'')
+    print('個体の牧場所属期間( a term in a farm)のリストを得る')
+    print('a paramete is a list only')
+    print('....................................................................................')
+    print('**fpyterms_in_farm_( xllists_ )')
+    print('get a list \'term in farm\'')
     print('parameter is one list(xllists_) only version')
     print('....................................................................................')
     print('**fpybelong_or_not( bdate, term )')
@@ -2944,7 +3067,13 @@ def fpychghistoryReference():
     print('**fpyind_belongornot( bdate, terms )')
     print('an individual belongs to a farm or not at a base date')
     print('基準日(bdate)に個体がその農場に属しているかどうか')
-    print('----------------------------------------------------------2023/12/20　by jicc---------')
+    print('....................................................................................')
+    print('**fpysep_outfrmin( wbN, sheetN, coln, ncol, index, name, bdate )')
+    print('separate move-out cows from move-in ')
+    print('異動情報のExcelfile: AB_cowshistory.xlsx の　sheet　ABFarmの情報を')
+    print('基準日における所属牛（転入牛move-in)と転出牛(move-out)の情報に分け、')
+    print('2枚のsheet ABFarmin, ABFarmout を作成する')
+    print('----------------------------------------------------------2024/1/2　by jicc---------')
     
     
 """
