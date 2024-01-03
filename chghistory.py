@@ -1200,6 +1200,9 @@ fpyflag_dblrcd_1 : flag double record 1
    検索年月日追加のため, #*11->12 に変更
    v1.01
    2023/10/14
+   *) 第2indexを変更
+    v1.02
+    2024/1/3
    @author: inoue
    
 """
@@ -1227,8 +1230,8 @@ def fpyflag_dblrcd_1(xllists):
         for j in range(0, i+1):
             #print(xllists[j])
             if j!= i:
-                if xllists[i][1:5] == xllists[j][1:5] and xllists[i][7:10] \
-                == xllists[j][7:10]:
+                if xllists[i][1:6] == xllists[j][1:6] and xllists[i][7:11] \
+                == xllists[j][7:11]: #5 -> 6, 10 -> 11 に修正2024/1/3 *)
                 #LinNo と No 以外が一致したら v1.01
                 #clmn 13(list index 12) flg(0) 0->1とする
                     xllists[i][12] = 1          #*11->12 に変更
