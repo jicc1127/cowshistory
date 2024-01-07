@@ -1499,10 +1499,14 @@ fpychk_drecords   :check doublue records
     検索年月日追加のため #* 11->12 に変更
     v1.01
     2023/10/14
+    add a parameter searchdate 
+    重複をのぞいた最終リストの検索年月日をすべてsearchdateにする　#**
+    v1.02
+    2024/1/6
     @author: inoue
     
 """
-def fpychk_drecords(wbN, sheetN):
+def fpychk_drecords(wbN, sheetN, searchdate):
     """
     check doublue records
     重複データを別シートに抜き出す
@@ -1512,23 +1516,25 @@ def fpychk_drecords(wbN, sheetN):
         Excelfile to check double data  '??_CowsHistory.xlsx'
     sheetN : str
         sheet name to check double data   '??Farm'
+    searchdate : str
+        'yyyy/mm/dd' 検索年月日
 
     Returns
     -------
     None.
 
     """
-    #import chghistory
+    import chghistory
     #wbobj = chghistory.fpyopenxl(wbN, sheetN)
     #wb = wbobj[0]
     #sheet = wbobj[1]
     
     #excelfileのデータをlists'listにする
-    xllists = fpyxllist_to_list(wbN,sheetN, 12)      #*
+    xllists = chghistory.fpyxllist_to_list(wbN,sheetN, 12)      #*
     #print("xllists")
     #print(xllists)
     #value"0"のカラムflagをすべてのリストに追加する
-    xllists_0 = fpyaddclm_to_lsts_lst(xllists, 0)
+    xllists_0 = chghistory.fpyaddclm_to_lsts_lst(xllists, 0)
     #print("xllists_0")
     #print(xllists_0)
     #重複データのflagを0->1に変更する
@@ -1536,32 +1542,42 @@ def fpychk_drecords(wbN, sheetN):
     #print("xllists_01")
     #print(xllists_01)
     #重複データのないlist
-    xllists0 = fpydel_dblrcd(xllists_01, 12, 0)      #*
+    xllists0 = chghistory.fpydel_dblrcd(xllists_01, 12, 0)      #*
     #print("xllists0")
     #print(xllists0)
+    
+    if type(searchdate) == str: #date = 'str'の場合datetimtに変換 #**
+        searchdate = chghistory.fpystrtodatetime( searchdate )
+    lxllists0 = len(xllists0)
+    for i in range(0,lxllists0):
+        xllists0[i][11] = searchdate                            #**
+    #** 検索年月日をすべてserchdateにする
+        
+    print("xllists0")
+    print(xllists0)
     #重複していたデータのリスト
-    xllists1 = fpydel_dblrcd(xllists_01, 12, 1)      #*
-    #print("xllists1")
-    #print(xllists1)
+    xllists1 = chghistory.fpydel_dblrcd(xllists_01, 12, 1)      #*
+    ##print(xllists1)
    
-    xllists0 = fpydelclm_frm_lsts_lst(xllists0, 12)  #*
+    xllists0 = chghistory.fpydelclm_frm_lsts_lst(xllists0, 12)  #*
     #print("xllists0")
     #print(xllists0)
     #col 'flag'の削除
-    xllists1 = fpydelclm_frm_lsts_lst(xllists1, 12)  #*
+    
+    xllists1 = chghistory.fpydelclm_frm_lsts_lst(xllists1, 12)  #*
     #print("xllists1")
     #print(xllists1)
     #col 'flag'の削除
     
     
     #シート名の変更
-    fpychgSheetTitle(wbN, sheetN, sheetN + 'org')
+    chghistory.fpychgSheetTitle(wbN, sheetN, sheetN + 'org')
     #振り分け用のシート　KTFarm　と　KTFarmout　を作成する。
-    fpyNewSheet(wbN, sheetN, 'columns', 1)
-    fpyNewSheet(wbN, sheetN + 'out', 'columns', 1)
+    chghistory.fpyNewSheet(wbN, sheetN, 'columns', 1)
+    chghistory.fpyNewSheet(wbN, sheetN + 'out', 'columns', 1)
     #データを振り分ける
-    fpylisttoxls( xllists0, 1, wbN, sheetN)
-    fpylisttoxls( xllists1, 1, wbN, sheetN + 'out')
+    chghistory.fpylisttoxls( xllists0, 1, wbN, sheetN)
+    chghistory.fpylisttoxls( xllists1, 1, wbN, sheetN + 'out')
     
 
 #fpyreplace_str#########################################################
@@ -1727,6 +1743,8 @@ fpyselect_newrecords   :select new records from transfer information
 v1.0
 2022/7/16
 
+注) fpyselect_newrecords_s の修正、v1.01,1.02が反映されていない。2024/1/5
+
 @author: inoue
 """
 def fpyselect_newrecords(wbN, sheetN, ncol, idno):
@@ -1808,8 +1826,10 @@ fpyselect_newrecords_s   :select new records from transfer information
     #*  change str yyyy/0m/0d to datetime yyyy/m/d
     v1.01
     2023/10/7
-
-@author: inoue
+    #** コメント修正、追加
+    v1.02
+    2024/1/5
+    @author: jicc
 """
 def fpyselect_newrecords_s(driver, sheet, ncol, idno):
     """
@@ -1832,21 +1852,23 @@ def fpyselect_newrecords_s(driver, sheet, ncol, idno):
     [[title], [[newrecord],..], [[overlapped record],..]] 
 
     """
-    #import chghistory
+    import chghistory
     import nlbcs
     #import time
     import fmstls
     
     #excelfileのデータをlists'listにする
-    xllists = fpyxllist_to_indlist_s(sheet, ncol, idno)
+    xllists = chghistory.fpyxllist_to_indlist_s(sheet, ncol, idno)
     #print("xllists")
     #print(xllists)
-    xllists = fpylstelemreplace_str(xllists, 10, '\u3000', ' ')
+    xllists = chghistory.fpylstelemreplace_str(xllists, 10, '\u3000', ' ')
     #list 10(11番目)の"氏名または名称"の全角空白を半角空白に変換 
     #print('xllists')
     #print(xllists)    
     trs_inf = nlbcs.fpytrsinf_to_list(driver, idno)
-    #lists' list [[title], [[newrecord],..], [[overlapped record],..]]
+    #lists' list [[title], [trsinf1],[trs_inf2],...]   #**
+    #print('trs_inf')
+    #print(trs_inf)
     
     l = len(trs_inf)
     for i in range(1,l): #*
@@ -1866,25 +1888,27 @@ def fpyselect_newrecords_s(driver, sheet, ncol, idno):
     trs_inf01 = [] #default
     #value"0"のカラムflagをすべてのリストに追加する
     #titleリストの最後にも0が追加されている
-    trs_inf_0 = fpyaddclm_to_lsts_lst(trs_inf, 0)
+    trs_inf_0 = chghistory.fpyaddclm_to_lsts_lst(trs_inf, 0)
     
     #xllistsにすでにあるlistのflagを0->1に変更する
     trs_inf_01 = fpyflag_dblrcd_1_(xllists, trs_inf_0)
     
     #list of new records　[[title], [newrecord], ...]
-    trs_inf0 = fpydel_dblrcd(trs_inf_01, 11, 0)
+    trs_inf0 = chghistory.fpydel_dblrcd(trs_inf_01, 11, 0)
     
     #list of overlapped records
-    trs_inf1 = fpydel_dblrcd(trs_inf_01, 11, 1)
+    trs_inf1 = chghistory.fpydel_dblrcd(trs_inf_01, 11, 1)
     
     #delete col 'flag'
-    trs_inf0 = fpydelclm_frm_lsts_lst(trs_inf0, 11)
+    trs_inf0 = chghistory.fpydelclm_frm_lsts_lst(trs_inf0, 11)
     
     #delete col 'flag'
-    trs_inf1 = fpydelclm_frm_lsts_lst(trs_inf1, 11)
+    trs_inf1 = chghistory.fpydelclm_frm_lsts_lst(trs_inf1, 11)
         
     trs_inf01.append(trs_inf0[0])  #[[title]]
-    trs_inf01.append(trs_inf0[1:]) #[[title], [[newrecords],..]]
+    trs_inf01.append(trs_inf0[1:]) 
+    #[title]を除く   #**
+    #[[title], [[newrecords],..]]
     trs_inf01.append(trs_inf1)     
     #[[title], [[newrecord],..], [[overlapped record],..]] 
     #print('trs_inf01')
@@ -3158,11 +3182,13 @@ def fpyCowsHistoryManualfrmweb():
 fpyCowsHistoryTools:                        tools
 ｖ1.0
 2022/7/29
+v1.01
+2024/1/7
 @author: jicc
 """
 def fpyCowsHistoryTools():
     
-    print('-----CowsHistoryTools---------------------------------------------------------v2.00-------')
+    print('-----CowsHistoryTools---------------------------------------------------------v2.01-------')
     print('牛の個体情報検索サービス 個体識別番号の検索から個体の異動情報を検索し、')
     print('Excelファイルにリスト化するための　Tool集')
     print(' ')
@@ -3181,10 +3207,10 @@ def fpyCowsHistoryTools():
     print('  wbN0 : cowshistory.xlsx, sheetN0 : ABFarm, colidno0 : 2 (column number fo idno0), ')
     print(' wbN1 : AB_cowslist.xlsx, sheetN1 : cowslist, colidno1 : 2 (column number fo idno1)')
     print(' ')
-    print('#fpychk_drecords(wbN, sheetN)')
+    print('#fpychk_drecords(wbN, sheetN, searchdate)')
     print('Excel個体情報リスト cowshistory/ABFarmの重複データをを削除する')
-    print('   PS> ps_fpychk_drecords_args.py wbN sheetN')
-    print(' wbN: ..\\AB_cowshistory.xlsx, sheetN:ABFarm')
+    print('   PS> ps_fpychk_drecords_args.py wbN sheetN searchdate')
+    print(' wbN: ..\\AB_cowshistory.xlsx, sheetN:ABFarm, searchdate:\'yyyy/mm/dd\'')
     print(' ')
     print('#fpydel_d_idNo(wbN, sheetN)')
     print('個体リスト AB_cowslist/ABFarmのidnoの重複データをを削除する')
@@ -3196,4 +3222,4 @@ def fpyCowsHistoryTools():
     print('カレントディレクトリに　path名のディレクトリが存在しなければ作成する')
     print('   PS> ps_fpymkd_path_args.py path')
     print(' path: .\\csvhistory, .\\bck etc')
-    print('---------------------------------------------------------------2023/9/27 by jicc---------')    
+    print('---------------------------------------------------------------2024/1/7 by jicc---------')    
