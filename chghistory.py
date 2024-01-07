@@ -1524,17 +1524,17 @@ def fpychk_drecords(wbN, sheetN, searchdate):
     None.
 
     """
-    import chghistory
+    #import chghistory
     #wbobj = chghistory.fpyopenxl(wbN, sheetN)
     #wb = wbobj[0]
     #sheet = wbobj[1]
     
     #excelfileのデータをlists'listにする
-    xllists = chghistory.fpyxllist_to_list(wbN,sheetN, 12)      #*
+    xllists = fpyxllist_to_list(wbN,sheetN, 12)      #*
     #print("xllists")
     #print(xllists)
     #value"0"のカラムflagをすべてのリストに追加する
-    xllists_0 = chghistory.fpyaddclm_to_lsts_lst(xllists, 0)
+    xllists_0 = fpyaddclm_to_lsts_lst(xllists, 0)
     #print("xllists_0")
     #print(xllists_0)
     #重複データのflagを0->1に変更する
@@ -1542,12 +1542,12 @@ def fpychk_drecords(wbN, sheetN, searchdate):
     #print("xllists_01")
     #print(xllists_01)
     #重複データのないlist
-    xllists0 = chghistory.fpydel_dblrcd(xllists_01, 12, 0)      #*
+    xllists0 = fpydel_dblrcd(xllists_01, 12, 0)      #*
     #print("xllists0")
     #print(xllists0)
     
     if type(searchdate) == str: #date = 'str'の場合datetimtに変換 #**
-        searchdate = chghistory.fpystrtodatetime( searchdate )
+        searchdate = fpystrtodatetime( searchdate )
     lxllists0 = len(xllists0)
     for i in range(0,lxllists0):
         xllists0[i][11] = searchdate                            #**
@@ -1556,28 +1556,28 @@ def fpychk_drecords(wbN, sheetN, searchdate):
     print("xllists0")
     print(xllists0)
     #重複していたデータのリスト
-    xllists1 = chghistory.fpydel_dblrcd(xllists_01, 12, 1)      #*
+    xllists1 = fpydel_dblrcd(xllists_01, 12, 1)      #*
     ##print(xllists1)
    
-    xllists0 = chghistory.fpydelclm_frm_lsts_lst(xllists0, 12)  #*
+    xllists0 = fpydelclm_frm_lsts_lst(xllists0, 12)  #*
     #print("xllists0")
     #print(xllists0)
     #col 'flag'の削除
     
-    xllists1 = chghistory.fpydelclm_frm_lsts_lst(xllists1, 12)  #*
+    xllists1 = fpydelclm_frm_lsts_lst(xllists1, 12)  #*
     #print("xllists1")
     #print(xllists1)
     #col 'flag'の削除
     
     
     #シート名の変更
-    chghistory.fpychgSheetTitle(wbN, sheetN, sheetN + 'org')
+    fpychgSheetTitle(wbN, sheetN, sheetN + 'org')
     #振り分け用のシート　KTFarm　と　KTFarmout　を作成する。
-    chghistory.fpyNewSheet(wbN, sheetN, 'columns', 1)
-    chghistory.fpyNewSheet(wbN, sheetN + 'out', 'columns', 1)
+    fpyNewSheet(wbN, sheetN, 'columns', 1)
+    fpyNewSheet(wbN, sheetN + 'out', 'columns', 1)
     #データを振り分ける
-    chghistory.fpylisttoxls( xllists0, 1, wbN, sheetN)
-    chghistory.fpylisttoxls( xllists1, 1, wbN, sheetN + 'out')
+    fpylisttoxls( xllists0, 1, wbN, sheetN)
+    fpylisttoxls( xllists1, 1, wbN, sheetN + 'out')
     
 
 #fpyreplace_str#########################################################
