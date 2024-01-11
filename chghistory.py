@@ -1203,6 +1203,9 @@ fpyflag_dblrcd_1 : flag double record 1
    *) 第2indexを変更
     v1.02
     2024/1/3
+   #** olddata を削除対象の重複データとするように変更
+   v1.03
+   2024/1/11
    @author: inoue
    
 """
@@ -1234,7 +1237,12 @@ def fpyflag_dblrcd_1(xllists):
                 == xllists[j][7:11]: #5 -> 6, 10 -> 11 に修正2024/1/3 *)
                 #LinNo と No 以外が一致したら v1.01
                 #clmn 13(list index 12) flg(0) 0->1とする
-                    xllists[i][12] = 1          #*11->12 に変更
+                    
+                    #newdata を削除対象の重複データとする場合
+                    #xllists[i][12] = 1          #*11->12 に変更
+                    
+                    #olddata を削除対象の重複データとする場合  #**
+                    xllists[j][12] = 1
 
                 else:
                     continue
@@ -1499,14 +1507,10 @@ fpychk_drecords   :check doublue records
     検索年月日追加のため #* 11->12 に変更
     v1.01
     2023/10/14
-    add a parameter searchdate 
-    重複をのぞいた最終リストの検索年月日をすべてsearchdateにする　#**
-    v1.02
-    2024/1/6
     @author: inoue
     
 """
-def fpychk_drecords(wbN, sheetN, searchdate):
+def fpychk_drecords(wbN, sheetN):
     """
     check doublue records
     重複データを別シートに抜き出す
@@ -1524,17 +1528,17 @@ def fpychk_drecords(wbN, sheetN, searchdate):
     None.
 
     """
-    #import chghistory
+    import chghistory
     #wbobj = chghistory.fpyopenxl(wbN, sheetN)
     #wb = wbobj[0]
     #sheet = wbobj[1]
     
     #excelfileのデータをlists'listにする
-    xllists = fpyxllist_to_list(wbN,sheetN, 12)      #*
+    xllists = chghistory.fpyxllist_to_list(wbN,sheetN, 12)      #*
     #print("xllists")
     #print(xllists)
     #value"0"のカラムflagをすべてのリストに追加する
-    xllists_0 = fpyaddclm_to_lsts_lst(xllists, 0)
+    xllists_0 = chghistory.fpyaddclm_to_lsts_lst(xllists, 0)
     #print("xllists_0")
     #print(xllists_0)
     #重複データのflagを0->1に変更する
@@ -1542,12 +1546,93 @@ def fpychk_drecords(wbN, sheetN, searchdate):
     #print("xllists_01")
     #print(xllists_01)
     #重複データのないlist
-    xllists0 = fpydel_dblrcd(xllists_01, 12, 0)      #*
+    xllists0 = chghistory.fpydel_dblrcd(xllists_01, 12, 0)      #*
+    #print("xllists0")
+    #print(xllists0)
+  
+    #重複していたデータのリスト
+    xllists1 = chghistory.fpydel_dblrcd(xllists_01, 12, 1)      #*
+    ##print(xllists1)
+   
+    xllists0 = chghistory.fpydelclm_frm_lsts_lst(xllists0, 12)  #*
+    #print("xllists0")
+    #print(xllists0)
+    #col 'flag'の削除
+    
+    xllists1 = chghistory.fpydelclm_frm_lsts_lst(xllists1, 12)  #*
+    #print("xllists1")
+    #print(xllists1)
+    #col 'flag'の削除
+    
+    
+    #シート名の変更
+    chghistory.fpychgSheetTitle(wbN, sheetN, sheetN + 'org')
+    #振り分け用のシート　KTFarm　と　KTFarmout　を作成する。
+    chghistory.fpyNewSheet(wbN, sheetN, 'columns', 1)
+    chghistory.fpyNewSheet(wbN, sheetN + 'del', 'columns', 1)
+    #データを振り分ける
+    chghistory.fpylisttoxls( xllists0, 1, wbN, sheetN)
+    chghistory.fpylisttoxls( xllists1, 1, wbN, sheetN + 'del')
+    
+#fpychk_drecords_#########################################################
+"""
+fpychk_drecords   :check doublue records
+    重複データを別シートに抜き出す
+    v1.0
+    2022/3/30
+    検索年月日追加のため #* 11->12 に変更
+    v1.01
+    2023/10/14
+    add a parameter searchdate 
+    重複をのぞいた最終リストの検索年月日をすべてsearchdateにする　#**
+    v1.02
+    2024/1/6
+    @author: inoue
+    注)fpyflag_dblrcd_1(xllists)の変更で検索年月日の入力を回避したので、
+    v1.01に戻った。　この関数は使用せず。　2024/1/11
+"""
+def fpychk_drecords_(wbN, sheetN, searchdate):
+    """
+    check doublue records
+    重複データを別シートに抜き出す
+    Parameters
+    ----------
+    wbN : str
+        Excelfile to check double data  '??_CowsHistory.xlsx'
+    sheetN : str
+        sheet name to check double data   '??Farm'
+    searchdate : str
+        'yyyy/mm/dd' 検索年月日
+
+    Returns
+    -------
+    None.
+
+    """
+    import chghistory
+    #wbobj = chghistory.fpyopenxl(wbN, sheetN)
+    #wb = wbobj[0]
+    #sheet = wbobj[1]
+    
+    #excelfileのデータをlists'listにする
+    xllists = chghistory.fpyxllist_to_list(wbN,sheetN, 12)      #*
+    #print("xllists")
+    #print(xllists)
+    #value"0"のカラムflagをすべてのリストに追加する
+    xllists_0 = chghistory.fpyaddclm_to_lsts_lst(xllists, 0)
+    #print("xllists_0")
+    #print(xllists_0)
+    #重複データのflagを0->1に変更する
+    xllists_01 = fpyflag_dblrcd_1(xllists_0)
+    #print("xllists_01")
+    #print(xllists_01)
+    #重複データのないlist
+    xllists0 = chghistory.fpydel_dblrcd(xllists_01, 12, 0)      #*
     #print("xllists0")
     #print(xllists0)
     
     if type(searchdate) == str: #date = 'str'の場合datetimtに変換 #**
-        searchdate = fpystrtodatetime( searchdate )
+        searchdate = chghistory.fpystrtodatetime( searchdate )
     lxllists0 = len(xllists0)
     for i in range(0,lxllists0):
         xllists0[i][11] = searchdate                            #**
@@ -1556,29 +1641,28 @@ def fpychk_drecords(wbN, sheetN, searchdate):
     print("xllists0")
     print(xllists0)
     #重複していたデータのリスト
-    xllists1 = fpydel_dblrcd(xllists_01, 12, 1)      #*
+    xllists1 = chghistory.fpydel_dblrcd(xllists_01, 12, 1)      #*
     ##print(xllists1)
    
-    xllists0 = fpydelclm_frm_lsts_lst(xllists0, 12)  #*
+    xllists0 = chghistory.fpydelclm_frm_lsts_lst(xllists0, 12)  #*
     #print("xllists0")
     #print(xllists0)
     #col 'flag'の削除
     
-    xllists1 = fpydelclm_frm_lsts_lst(xllists1, 12)  #*
+    xllists1 = chghistory.fpydelclm_frm_lsts_lst(xllists1, 12)  #*
     #print("xllists1")
     #print(xllists1)
     #col 'flag'の削除
     
     
     #シート名の変更
-    fpychgSheetTitle(wbN, sheetN, sheetN + 'org')
+    chghistory.fpychgSheetTitle(wbN, sheetN, sheetN + 'org')
     #振り分け用のシート　KTFarm　と　KTFarmout　を作成する。
-    fpyNewSheet(wbN, sheetN, 'columns', 1)
-    fpyNewSheet(wbN, sheetN + 'out', 'columns', 1)
+    chghistory.fpyNewSheet(wbN, sheetN, 'columns', 1)
+    chghistory.fpyNewSheet(wbN, sheetN + 'del', 'columns', 1)
     #データを振り分ける
-    fpylisttoxls( xllists0, 1, wbN, sheetN)
-    fpylisttoxls( xllists1, 1, wbN, sheetN + 'out')
-    
+    chghistory.fpylisttoxls( xllists0, 1, wbN, sheetN)
+    chghistory.fpylisttoxls( xllists1, 1, wbN, sheetN + 'del')
 
 #fpyreplace_str#########################################################
 """
