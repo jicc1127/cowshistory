@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 #コマンドラインから、引数を渡す
 #　PS> python ps_fpysep_outfrmin_args.py wbN sheetN coln ncol index name bdate
-# wbN0 : cowshistory.xlsx, sheetN0 : ABFarm, wbN1 : AB_cowslist.xlsx, sheetN1 : cowslist, 
-#colidno1 : 2 (column number fo idno1)
+# wbN : cowshistory.xlsx, sheetN : ABFarm, coln : 2, ncol : 12, index : 10, 
+#name :  AB Farm, bdate : yyyy/mm/dd
+
 import sys
 import chghistory
 
