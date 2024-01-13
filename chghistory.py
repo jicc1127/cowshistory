@@ -3312,11 +3312,10 @@ def fpyCowsHistoryTools():
 
 
 """
-fpyCowsHistoryTools:                        tools
+fpyCowsHistory_webscrsys:                        tools
 ｖ1.0
-2022/7/29
-v1.01
-2024/1/7
+2024/1/13
+
 @author: jicc
 """
 def fpyCowsHistory_webscrsys():
