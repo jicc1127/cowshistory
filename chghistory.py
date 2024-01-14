@@ -1577,7 +1577,7 @@ def fpychk_drecords(wbN, sheetN):
     
 #fpychk_drecords_#########################################################
 """
-fpychk_drecords   :check doublue records
+fpychk_drecords_   :check doublue records
     重複データを別シートに抜き出す
     v1.0
     2022/3/30
@@ -1591,6 +1591,9 @@ fpychk_drecords   :check doublue records
     @author: inoue
     注)fpyflag_dblrcd_1(xllists)の変更で検索年月日の入力を回避したので、
     v1.01に戻った。　この関数は使用せず。　2024/1/11
+    注2）CowsHistory_webscrsys/ps_fpychk_drecords__args.py で使用 '__'に注意。
+      後で、これは要らないことが判明。ps_fpychk_drecords_args.pywo
+    修正した。2024/1/14
 """
 def fpychk_drecords_(wbN, sheetN, searchdate):
     """
