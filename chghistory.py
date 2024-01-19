@@ -3013,7 +3013,7 @@ def fpysep_outfrmin( wbN, sheetN, coln, ncol, index, name, bdate ):
                 #wb.save('..\CD_cowshistory.xlsx')
                 
     wb.save(wbN)
-          
+
 #fpychghistoryReference###################################################################
 """
 fpychghistoryReference:         reference of chghistory's functions
