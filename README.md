@@ -32,12 +32,14 @@ separate move-out cows from move-in
 - AB_cowshistory.x;sx/ABFarm : ABFarm の cowshistory(異動情報)
 
 sheet ABFarm
+
 | LineNo | 個体識別番号 | 出生の年月日 | 雌雄の別 | 母牛の個体識別番号 | 種別 |
 | No | 異動内容 | 異動年月日 | 住所 | 氏名または名称 | 検索年月日 |
 
 - AB_cowslist.xlsx/cowslist : ABFarmのcowslist
 
 sheet cowslist のcolumnを以下のように設定する :
+
 | cowslist_id | cowidNo | eartagNo | DHITNo | name | breed | birthday | sex |
 | sire_code | sire_name | damidNo | dameartagNo | in_date | in_reason | from | out_date |
 | out_reason | to | note | base_date |
