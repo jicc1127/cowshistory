@@ -1,6 +1,8 @@
 # cowshistory
 PS C:\Users\inoue\Dropbox\rep\cowshistory>  python ps_cowshistory_webscrsys_args.py
+
 -----CowsHistory_webscrsys---------------------------------------------------------v2.01-------
+
 牛の個体情報検索サービス 個体識別番号の検索から個体の異動情報を検索し、
 Excelファイルにリスト化するシステム
 
@@ -24,4 +26,5 @@ separate move-out cows from move-in
 異動情報のExcelfile: AB_cowshistory.xlsx の　sheet　ABFarmの情報を
 基準日における所属牛（転入牛move-in)と退出牛(転出牛move-out)の情報に分け、
 2枚のsheet ABFarmin, ABFarmout を作成する
+
 ---------------------------------------------------------------2024/1/13 by jicc---------
