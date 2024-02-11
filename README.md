@@ -57,12 +57,19 @@ or
   例外処理していないので、止まります。
   以下の作業をお願いします。  
   1) Chromeのバージョン確認
+  
   右上(：)メニュー -> ヘルプ -> Google Chromeについて
+
   バージョン: 121.0.6167.161（Official Build） （64 ビット）
+  
   2) chromeDriverのダウンロード
-  https://chromedriver.chromium.org/downloads
-  chromedriver_win64.zipをダウンロード
-  3)  Users\\username\\AppData\\Local\\Programs\\Python\\Python39\\chromedriver.exe
+  
+    https://chromedriver.chromium.org/downloads
+
+    chromedriver_win64.zipをダウンロード
+  
+  3) Users\\username\\AppData\\Local\\Programs\\Python\\Python39\\chromedriver.exe
+     
     書き込み、または、バージョンがあってない場合は、書き換えが必要。
 
   
