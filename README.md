@@ -49,3 +49,23 @@ or
 | cowslist_id | 個体識別番号 | 耳標 | 検定番号 | 名前 | 品種 | 生年月日 | 性別 |
 | 種雄牛コード | 種雄牛名 | 母牛個体識別番号 | 母牛耳標 | 導入年月日 | 導入理由 | 導入元 | 転出年月日 |
 | 転出理由 | 転出先 | note | 基準日 |
+
+- CowsHistory_webscrsys　PS> ps_fpytrs_infs_to_xlsx_args.py wbN0 sheetN0 wbN1 sheetN1 colidno1
+  webscrape するとき
+  Google chrome のみで動きます。
+  chromedriver がない、または　バージョンがあわない場合は、エラーが出ます。
+  例外処理していないので、止まります。
+  以下の作業をお願いします。  
+  1) Chromeのバージョン確認
+  右上(：)メニュー -> ヘルプ -> Google Chromeについて
+  バージョン: 121.0.6167.161（Official Build） （64 ビット）
+  2) chromeDriverのダウンロード
+  https://chromedriver.chromium.org/downloads
+  chromedriver_win64.zipをダウンロード
+  3)  Users\\username\\AppData\\Local\\Programs\\Python\\Python39\\chromedriver.exe
+    書き込み、または、バージョンがあってない場合は、書き換えが必要。
+
+  
+  
+ 
+  
