@@ -41,7 +41,9 @@ sheet cowslist のcolumnを以下のように設定する :
 | cowslist_id | cowidNo | eartagNo | DHITNo | name | breed | birthday | sex |
 | sire_code | sire_name | damidNo | dameartagNo | in_date | in_reason | from | out_date |
 | out_reason | to | note | base_date |
+
 or
+
 | cowslist_id | 個体識別番号 | 耳標 | 検定番号 | 名前 | 品種 | 生年月日 | 性別 |
 | 種雄牛コード | 種雄牛名 | 母牛個体識別番号 | 母牛耳標 | 導入年月日 | 導入理由 | 導入元 | 転出年月日 |
 | 転出理由 | 転出先 | note | 基準日 |
