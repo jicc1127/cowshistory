@@ -350,6 +350,59 @@ def fpymkxlsheet(wbN, sheetN, scolN, r):
      
     wb.save(wbN)
 
+#fpymkxlsheet_#############################################################
+"""
+fpymkxlsheet_ : make an ExcelSheet if it dose not exist
+    workbook version
+v1.0
+2024/2/18
+
+@author: inoue
+"""
+def fpymkxlsheet_(wb, sheetN, scolN, r):
+    """
+    make an ExcelSheet if it dose not exist
+    workbook version
+    Parameters
+    ----------
+    wb : workbook.workbook.Workbook
+         workbook object
+    sheetN : str
+        new sheet name  : 'ABFarmout'
+    scolN : str         シート名: "columns"
+        参照するシート
+	r : int		r行目 作成するcolumn行
+    
+    Returns
+    -------
+    sheet : worksheet object
+
+    """
+    #import openpyxl
+    
+    #wb = openpyxl.load_workbook(wbN)
+    #sheet = wbobj[1]
+    #sheet.title = sheetN1
+    snames = []
+    snames = wb.sheetnames #get_sheet_names()
+    print(snames)
+    
+    if sheetN not in snames:
+        wb.create_sheet(title=sheetN, index=0)
+        sheet = wb[sheetN]
+        scol = wb[scolN]
+        
+        maxcol = scol.max_column #sheet columnの最終列
+                
+        for i in range(1,maxcol+1):
+            sheet.cell(row=r, column=i).value = scol.cell(row=1, column=i).value
+        print("Sheet " +sheetN + " を作成しました。")
+    else:
+        sheet = wb[sheetN]
+        print("Sheet " +sheetN + " exists")
+     
+    return sheet
+
 #fpypdf_to_csv############################################################
 """
 fpypdf_to_csv
@@ -1452,7 +1505,7 @@ fpylisttoxls_s_:
     ｖ2.0
     2022/7/28
     @author: jicc
-    #cowshistory 以外で飼養していた場合を考えて fpylisttoxls_s_ として保存
+    #cowshistory 以外で使用していた場合を考えて fpylisttoxls_s_ として保存
     2023/10/13
     
 """
@@ -1497,6 +1550,54 @@ def fpylisttoxls_s_(xllist, fstcol, sheet):
     print('add  new data')  #2022/12/4 *) から変更
     
     #wb.save(wbN)
+
+#fpylisttoxls_s_ow############################################################
+"""
+fpylisttoxls_s_: 
+    sheet のlistのデータをexcelfile sheet に上書きする
+    overwrite Excel sheet with a modified list 
+    ｖ1.0
+    2024/2/11
+    @author: jicc
+        
+"""
+def fpylisttoxls_s_ow(xllist, fstcol, sheet):
+    """
+    listのデータをexcelfileに移行する
+    
+    開始行　2
+    開始列 fstcol
+    
+    Parameters
+    ----------
+    xllist : str
+        list from original Excel sheet 'AB_cowslist/cowslist2024'
+    fstcol : int
+        first column number to input data
+   sheet : worksheet.worksheet.Worksheet
+        worksheet object
+
+    Returns
+    -------
+    None.
+
+    """
+    #import chghistory
+    #import openpyxl
+    
+    #max_row = sheet.max_row                     
+    rn = 2 #title行を除く
+    ln = len(xllist)
+           #the length of the list xllist
+    if ln > 0: #リストに要素がない場合を排除 v1.01 2022/4/3
+        ln_ = len(xllist[0])   #the number of the xllist's list[0]
+        for i in range(0, ln):
+            for j in range(0, ln_):
+                sheet.cell(row=rn, column=j+fstcol).value = xllist[i][j]
+            rn = rn + 1
+            #print('add a new transfer informatyon')　#2022/12/3 削除 *)
+    else:
+    	print(' xllist have no element!')
 
 
 #fpychk_drecords#########################################################
@@ -3150,6 +3251,10 @@ def fpychghistoryReference():
     print('**fpymkxlsheet(wbN, sheetN, scolN, r)')
     print('make an ExcelSheet if it dose not exist')
     print('....................................................................................')
+    print('**fpymkxlsheet_(wb, sheetN, scolN, r)')
+    print('make an ExcelSheet if it dose not exist')
+    print('workbook version')
+    print('....................................................................................')
     print('**fpyelems_lstfrmxls_lst(wbN, sheetN, coln)')
     print('  fpyelems_lstfrmxls_lst_s(sheet, coln)')
     print('make an elements\' list from Excel\'s list')
@@ -3298,8 +3403,8 @@ def fpyCowsHistoryTools():
     print(' ')
     print('#fpychk_drecords(wbN, sheetN, searchdate)')
     print('Excel個体情報リスト cowshistory/ABFarmの重複データをを削除する')
-    print('   PS> ps_fpychk_drecords_args.py wbN sheetN searchdate')
-    print(' wbN: ..\\AB_cowshistory.xlsx, sheetN:ABFarm, searchdate:\'yyyy/mm/dd\'')
+    print('   PS> ps_fpychk_drecords_args.py wbN sheetN')
+    print(' wbN: ..\\AB_cowshistory.xlsx, sheetN:ABFarm')
     print(' ')
     print('#fpydel_d_idNo(wbN, sheetN)')
     print('個体リスト AB_cowslist/ABFarmのidnoの重複データをを削除する')
@@ -3334,10 +3439,10 @@ def fpyCowsHistory_webscrsys():
     print(' wbN0 : cowshistory.xlsx, sheetN0 : ABFarm, ')
     print(' wbN1 : AB_cowslist.xlsx, sheetN1 : cowslist, colidno1 : 2 (column number of idno1)')
     print(' ')
-    print('#fpychk_drecords(wbN, sheetN, searchdate)')
+    print('#fpychk_drecords(wbN, sheetN)')
     print('Excel個体情報リスト cowshistory/ABFarmの重複データをを削除する')
-    print('   PS> ps_fpychk_drecords_args.py wbN sheetN searchdate')
-    print(' wbN: ..\\AB_cowshistory.xlsx, sheetN:ABFarm, searchdate:\'yyyy/mm/dd\'')
+    print('   PS> ps_fpychk_drecords_args.py wbN sheetN')
+    print(' wbN: ..\\AB_cowshistory.xlsx, sheetN:ABFarm')
     print(' ')
     print('#fpysep_outfrmin( wbN, sheetN, coln, ncol, index, name, bdate )')
     print('   PS> python ps_fpysep_outfrmin_args.py wbN sheetN coln ncol index name bdate')
