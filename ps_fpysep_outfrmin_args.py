@@ -2,7 +2,7 @@
 #コマンドラインから、引数を渡す
 #　PS> python ps_fpysep_outfrmin_args.py wbN sheetN coln ncol index name bdate
 # wbN : cowshistory.xlsx, sheetN : ABFarm, coln : 2, ncol : 12, index : 10, 
-#name :  AB Farm, bdate : yyyy/mm/dd
+#name :  AB Farm '氏名または名称' , bdate : yyyy/mm/dd
 
 import sys
 import chghistory
