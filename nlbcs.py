@@ -123,9 +123,17 @@ def fpyname_click(driver, name):
     None.
 
     """
-    
+    #try:
+    #    element = driver.find_element_by_name(name)
+    #except AttributeError:
+    #    print('chromedriverのversionがあっていません。')
+    #else:
+    #    element.click()
+    #finally:
+    #    print('処理が中断しました。')
+   
     element = driver.find_element_by_name(name)
-    element.click()    
+    element.click()
     
 #fpyidno_search    
 """
@@ -688,28 +696,28 @@ def fpytrsinf_to_xlsx(driver,idno, sheet):
          ex. wb.save("cowshistory.xlsx")
    
     """
-    import nlbcs
+    #import nlbcs
     import chghistory
     
-    nlbcs.fpyidno_search(driver, idno )
+    fpyidno_search(driver, idno )
     #open the page of idno's transfer information
-    nowDate = nlbcs.fpynowDate_s00(driver) #not necessary? 不要? 2023/10/4
+    nowDate = fpynowDate_s00(driver) #not necessary? 不要? 2023/10/4
     print("nowDate")
     print(nowDate) #*
     print(idno) #*
     
-    nowDate_ = nlbcs.fpynowDate_s01(driver)
+    nowDate_ = fpynowDate_s01(driver)
     #get a nowDate_ with "yyyy/mm/dd" for a fillindate
     print("nowDate_")
     print(nowDate_)
     
-    isresults = nlbcs.fpyidno_search_results(driver)
+    isresults = fpyidno_search_results(driver)
     #get a list of individual number search results
     #print(isresults)
-    ind_inf = nlbcs.fpyind_inf(isresults)
+    ind_inf = fpyind_inf(isresults)
     #get a list of individual information
     #print(ind_inf)
-    trs_inf = nlbcs.fpytrs_inf(isresults, ind_inf, nowDate_)
+    trs_inf = fpytrs_inf(isresults, ind_inf, nowDate_)
     #get a list of transfer information
     #print(trs_inf)
     
