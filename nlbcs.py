@@ -328,6 +328,9 @@ def fpyind_inf(isresults):
     ind_inf.append(isresults[0:5])  #columns' name
     ind_inf.append(isresults[5:10]) #individual information
     
+    #print('ind_inf')
+    #print(ind_inf)
+    
     date = ind_inf[1][1] #1
     ind_inf[1][1] = chghistory.fpydate_dottoslash( date ) #1
     #else:
@@ -385,7 +388,7 @@ def fpytrs_inf(isresults, ind_inf, nowDate_):
     
     trs_inf.append(trs_inf_clmns)  #trs_inf = [[trs_inf_clmns]]
     #column名の行 trs_inf[0] をセット、以下に異動情報のリストを追加する。
-    print(trs_inf)
+    #print(trs_inf)
     isresults = isresults[17:] 
     #'個体識別番号'から'市区町村'まで削除し、異動情報だけのリストとする。
     #print('isresults')
@@ -416,8 +419,8 @@ def fpytrs_inf(isresults, ind_inf, nowDate_):
         #追加したdataを list isresults から削除する
         del isresults[0:6]
         
-    print('trs_inf_inddt')
-    print(trs_inf_inddt)
+    #print('trs_inf_inddt')
+    #print(trs_inf_inddt)
 
     for j in range(0, li):
         
@@ -662,7 +665,7 @@ def fpytrsinf_to_list(driver,idno):
     #print(trs_inf)
     return trs_inf
 
-#fpytrsinf_to_xlsx
+#fpytrsinf_to_xlsx###########################################nlbcs###########
 """
 fpytrsinf_to_xlsx:
      search and save individual transfer information to Excelfile
@@ -672,12 +675,16 @@ fpytrsinf_to_xlsx:
     #2) LineNo 入力を追加
     v1.03
     2023/10/4
+    #3) 例外 "StaleElementReferenceException" に対処するため、
+    ここに0.5sのスリープを挿入した。
+    v1.04
+    2025/7/6
     @author: jicc
     
 """
 def fpytrsinf_to_xlsx(driver,idno, sheet):
     """
-    search and save individual transfer information to Excelfile
+    search and save an individual transfer information to Excelfile
 
     Parameters
     ----------
@@ -698,9 +705,10 @@ def fpytrsinf_to_xlsx(driver,idno, sheet):
     """
     #import nlbcs
     import chghistory
-    
+    import time
     fpyidno_search(driver, idno )
     #open the page of idno's transfer information
+    time.sleep(0.5) #3)
     nowDate = fpynowDate_s00(driver) #not necessary? 不要? 2023/10/4
     print("nowDate")
     print(nowDate) #*
@@ -708,17 +716,22 @@ def fpytrsinf_to_xlsx(driver,idno, sheet):
     
     nowDate_ = fpynowDate_s01(driver)
     #get a nowDate_ with "yyyy/mm/dd" for a fillindate
-    print("nowDate_")
+    #print("nowDate_")
     print(nowDate_)
+    print("*****")
     
     isresults = fpyidno_search_results(driver)
     #get a list of individual number search results
-    #print(isresults)
+    print('isresults')
+    print(isresults)
+    print("************")
     ind_inf = fpyind_inf(isresults)
     #get a list of individual information
+    #print('ind_inf')
     #print(ind_inf)
     trs_inf = fpytrs_inf(isresults, ind_inf, nowDate_)
     #get a list of transfer information
+    #print('trs_inf')
     #print(trs_inf)
     
     l = len(trs_inf)    #trs_inf[1]~trs_inf[l-1]まで入力(trs_inf[0]:title) 
@@ -735,15 +748,15 @@ def fpytrsinf_to_xlsx(driver,idno, sheet):
     
     #sheet 3列 '出生の年月日' 'yyyy/mm/dd' -> datetimeに変換  #1)
     chghistory.fpyxlstrymdtodatetime_s( sheet, 3 )
-    print('sheet 3列 \'出生の年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
+    #print('sheet 3列 \'出生の年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
     
     #sheet 9列 '異動年月日' 'yyyy/mm/dd' -> datetimeに変換  #1)
     chghistory.fpyxlstrymdtodatetime_s( sheet, 9 )
-    print('sheet 9列 \'異動年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
+    #print('sheet 9列 \'異動年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
     
     #sheet 12列 '検索年月日' 'yyyy/mm/dd' -> datetimeに変換 #1)
     chghistory.fpyxlstrymdtodatetime_s( sheet, 12 )
-    print('sheet 12列 \'検索年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
+    #print('sheet 12列 \'検索年月日\' \'yyyy/mm/dd\' -> datetimeに変換')
     
     
     return sheet
