@@ -2341,6 +2341,13 @@ fpytrs_infs_to_xlsx:
     v1.11 : 3) 例外で、検索漏れのidNoのリスト、idno1_notfound, stale_element_notfound
     を Excel sheet wbN1/idno1_notfound, stale_element_notfound に書き出す処理を加えた。
     2025/7/9
+    4) .get_sheet_names() -> .sheetnames に変更した
+    DeprecationWarning: Call to deprecated function get_sheet_names (Use wb.sheetnames).
+    のwarning (非推奨)がでたため
+    2025/7/30
+    v1.2 :  5) driver 取得に例外処理を加えた。
+            6) if ... != [] 節を加え　その下のif節にelse:...を追加した。
+    2026/3/12
     @author: jicc
     
 """
@@ -2376,23 +2383,41 @@ def fpytrs_infs_to_xlsx(wbN0, sheetN0, wbN1, sheetN1, colidno1):
     from selenium.common.exceptions import NoSuchElementException
     from selenium.common.exceptions import StaleElementReferenceException
     
-    wb0obj = fpyopenxl(wbN0, sheetN0) #[wb0, sheet0]
+    wb0obj = fmstls.fpyopenxl(wbN0, sheetN0) #[wb0, sheet0]
     wb0 = wb0obj[0] #ex. AB_cowshistory.xlsx
     sheet0 = wb0obj[1] #ex. ABFarm
     #max_row0 = sheet0.max_row
     
-    wb1obj = fpyopenxl(wbN1, sheetN1) #[wb1, sheet1]
+    wb1obj = fmstls.fpyopenxl(wbN1, sheetN1) #[wb1, sheet1]
     wb1 = wb1obj[0] #ex. AB_cowslist.xlsx
     sheet1 = wb1obj[1] #ex. cowslist
     max_row1 = sheet1.max_row 
     
-    driver = nlbcs.fpyopen_url("https://www.id.nlbc.go.jp/CattleSearch/search/agreement")
+                                                                #5) 
+    try:
+        driver = nlbcs.fpyopen_url("https://www.id.nlbc.go.jp/CattleSearch/search/agreement")
+        if driver is None:
+            raise Exception("ドライバの初期化に失敗しました。")
+    except Exception as e:
+        print(e)
+        print("--------------------------------------------------")
+        print("【エラー】ブラウザを起動できませんでした。")
+        print("原因: chromedriverのバージョン不一致、またはファイルが見つかりません。")
+        print("対策:")
+        print("  1. Chromeの右上メニュー > ヘルプ > Google Chromeについて でバージョンを確認")
+        print("  2. 対応するchromedriverをダウンロード")
+        print("     https://chromedriver.chromium.org/downloads")
+        print("  3. 指定のパスへ書き込み、または、上書きしてください")
+        print(r"      Users\username\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+        print("--------------------------------------------------")
+        return  # ここで安全に処理を終了させる
+    
     nlbcs.fpyname_click(driver, "method:goSearch") 
     idno1_notfound = list()
     stale_element_notfound = list()
     for row_num1 in range(2, max_row1 + 1):
         
-        idno1 = fpygetCell_value(sheet1, row_num1, colidno1)
+        idno1 = fmstls.fpygetCell_value(sheet1, row_num1, colidno1)
         
         try:
 
@@ -2416,23 +2441,27 @@ def fpytrs_infs_to_xlsx(wbN0, sheetN0, wbN1, sheetN1, colidno1):
     #3)
     #検索できなかったidNosのリストidno1_notfound, stale_element_notfoundを
     #sheet 'idno_notfound', 'stale_element_notfound'にリストアップする。
-    sheet_names = wb1.get_sheet_names()
+    sheet_names = wb1.sheetnames    #4)
     
+    if idno1_notfound != []:        #6)
+        if 'idno_notfound' not in sheet_names:
+            sheet2 = fmstls.fpyNewSheet_w(wb1, 'idno_notfound', 'columns', 1)
+        else:
+            sheet2 = wb1['idno_notfound']
     
-    if 'idno_notfound' not in sheet_names:
-        sheet2 = fmstls.fpyNewSheet_w(wb1, 'idno_notfound', 'columns', 1)
-    
-    sheet2 = fmstls.fpylist_to_xls_column_s(sheet2, 2, idno1_notfound)
-    
-    print('idno1_notfound')
-    print(idno1_notfound)
+        sheet2 = fmstls.fpylist_to_xls_column_s(sheet2, 2, idno1_notfound)
+        print('idno1_notfound')
+        print(idno1_notfound)
      
-    if 'stale_element_notfound' not in sheet_names:
-        sheet3 = fmstls.fpyNewSheet_w(wb1, 'stale_element_notfound', 'columns', 1)
+    if stale_element_notfound != []:
+        if 'stale_element_notfound' not in sheet_names:
+            sheet3 = fmstls.fpyNewSheet_w(wb1, 'stale_element_notfound', 'columns', 1)
+        else:
+            sheet3 = wb1['stale_element_notfound']
     
-    sheet3 = fmstls.fpylist_to_xls_column_s(sheet3, 2, stale_element_notfound)
-    print('stale_element_notfound')
-    print(stale_element_notfound)
+        sheet3 = fmstls.fpylist_to_xls_column_s(sheet3, 2, stale_element_notfound)
+        print('stale_element_notfound')
+        print(stale_element_notfound)
     
     wb1.save(wbN1) 
     #3)
@@ -2508,6 +2537,79 @@ def fpytrs_infs_to_xlsx_idnos_list(wbN, sheetN, idnoslst ):
         i = i+1       # 1)
     
     wb.save(wbN)
+    time.sleep(3)
+    nlbcs.fpydriver_quit(driver)
+    
+    print('idno_notfound')
+    print(idno_notfound)
+
+    print('stale_element_notfound')
+    print(stale_element_notfound)
+
+#fpytrs_infs_to_xlsx_idnos_list_s################################chghistory##
+"""
+fpytrs_infs_to_xlsx_idnos_list_s:
+    search and save individual transfer informations from list to Excelfile
+    idNos' list version
+    sheet version
+    v1.0
+    2025/7/30
+    @author: jicc
+    
+"""
+def fpytrs_infs_to_xlsx_idnos_list_s(sheet, idnoslst ):
+    """
+    search and save individual transfer informations from list to Excelfile
+    idNos' list version
+    sheet version
+    v1.0
+    2025/7/30
+    @author: jicc
+    
+    Parameters
+    ----------
+    sheet :  worksheet.worksheet.Worksheet
+         worksheet object
+    idnoslst: list
+        idnos'list
+
+    Returns
+    -------
+    None.
+
+    """
+    import nlbcs
+    #import chghistory
+    import time
+    from selenium.common.exceptions import NoSuchElementException
+    from selenium.common.exceptions import StaleElementReferenceException
+    
+    lidnoslst = len(idnoslst)
+    
+    driver = nlbcs.fpyopen_url("https://www.id.nlbc.go.jp/CattleSearch/search/agreement")
+    nlbcs.fpyname_click(driver, "method:goSearch") 
+    idno_notfound = list()
+    stale_element_notfound = list()
+    for i in range(0, lidnoslst):
+        
+        idno = idnoslst[i]
+        
+        try:
+
+            nlbcs.fpytrsinf_to_xlsx(driver, idno, sheet)
+            
+        except NoSuchElementException:
+             print("Error: " + idno + " not found")
+             print("*****")
+             idno_notfound.append(idno)
+        except StaleElementReferenceException:
+            print(idno + ":stale element reference: stale element not found")
+            print("*****")
+            stale_element_notfound.append(idno)
+        
+        i = i+1       # 1)
+    
+    return sheet #wb.save(wbN)
     time.sleep(3)
     nlbcs.fpydriver_quit(driver)
     
@@ -3314,7 +3416,7 @@ fpychghistoryReference:         reference of chghistory's functions
 """
 def fpychghistoryReference():
     
-    print('-----chghistoryReference ---------------------------------------------------------v2.00------')
+    print('-----chghistoryReference ---------------------------------------------------------v2.01------')
     print('**fpyopenxl(wbN, sheetN)')
     print('Excelfile wbN.xlsx　sheet sheetN Open ')
     print('.............................................................................................')
@@ -3493,7 +3595,7 @@ def fpychghistoryReference():
     print('異動情報のExcelfile: AB_cowshistory.xlsx の　sheet　ABFarmの情報を')
     print('基準日における所属牛（転入牛move-in)と転出牛(move-out)の情報に分け、')
     print('2枚のsheet ABFarmin, ABFarmout を作成する')
-    print('----------------------------------------------------------2024/1/2　by jicc---------')
+    print('----------------------------------------------------------2025/7/6　by jicc---------')
     
     
 """

@@ -53,9 +53,9 @@ or
 - CowsHistory_webscrsys　PS> ps_fpytrs_infs_to_xlsx_args.py wbN0 sheetN0 wbN1 sheetN1 colidno1
   webscrape するとき
   Google chrome のみで動きます。
-  chromedriver がない、または　バージョンがあわない場合は、エラーが出ます。
-  例外処理がうまくいってないので止まります。
-  以下の作業をお願いします。  
+  chromedriver がない、または　バージョンがあわない場合は止まります。
+  以下の作業をお願いします。
+    
   1) Chromeのバージョン確認
   
   右上(：)メニュー -> ヘルプ -> Google Chromeについて
